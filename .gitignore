@@ -1,0 +1,12 @@
+# Files from build
+**/*.o
+**/*.s
+**/*.log
+**/*.out
+**/.depend
+**/.vscode
+**/.idea
+**/__pycache__
+
+# Build folder
+/build/
