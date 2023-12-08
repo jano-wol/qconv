@@ -1,13 +1,16 @@
 #ifndef QCONV_CORE_SIMDOPS_H_
 #define QCONV_CORE_SIMDOPS_H_
 
-#include <simde/x86/avx2.h>
-#include <simde/x86/fma.h>
+#include <cassert>
 #include <tuple>
 #include <type_traits>
 
+#include <simde/x86/avx2.h>
+#include <simde/x86/fma.h>
+
 #if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
 #pragma GCC diagnostic ignored "-Wignored-attributes"
+#pragma GCC diagnostic ignored "-Wsign-compare"
 #define FORCE_INLINE inline __attribute__((always_inline))
 #define NO_INLINE __attribute__((noinline))
 #define RESTRICT __restrict__
@@ -27,7 +30,7 @@
 #define UNLIKELY(x) (x)
 #endif
 
-namespace Evaluation::simd
+namespace simdops
 {
 
 enum InstructionType {
@@ -1270,5 +1273,5 @@ void assertInRange(simde__m256i x, int min, int max)
   assertInRange<T>(t, min, max);
 }
 }  // namespace debug
-}  // namespace Evaluation::simd
+}  // namespace simdops
 #endif  // QCONV_CORE_SIMDOPS_H_
