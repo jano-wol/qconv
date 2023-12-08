@@ -25,15 +25,9 @@ void weightInit_32_512(T a[32][512])
 {
   for (int i = 0; i < 32; ++i) {
     for (int j = 0; j < 512; ++j) {
-      a[i][j] = 0;
+      a[i][j] = (i + j) % 128;
     }
   }
-  a[0][1] = 1;
-  a[1][0] = 2;
-  a[30][511] = 2;
-  a[31][510] = 1;
-  a[30][510] = 3;
-  a[31][511] = 3;
 }
 
 void checkTrue(bool check)
@@ -312,12 +306,45 @@ static void naive_linear_512_int8_t(benchmark::State& state)
       out[i] = sum;
     }
   }
-  checkTrue(out[0] == 1);    // 1 * 1 + 0
-  checkTrue(out[1] == 1);    // 2 * 0 + 1
-  checkTrue(out[30] == 38);  // 3 * 6 + 2 * 7 + 6
-  checkTrue(out[31] == 34);  // 1 * 6 + 3 * 7 + 7
+  checkTrue(out[0] == 116480);
+  checkTrue(out[1] == 114689);
+  checkTrue(out[30] == 113414);
+  checkTrue(out[31] == 114695);
 }
 BENCHMARK(naive_linear_512_int8_t);
+
+static void naive_linear_512_float(benchmark::State& state)
+{
+  float in[512];
+  float bias[32];
+  float weight[32][512];
+  float out[32];
+  for (int i = 0; i < 512; ++i) {
+    in[i] = 1.0 / static_cast<float>(i + 1);
+  }
+  for (int i = 0; i < 32; ++i) {
+    bias[i] = 1.0 / static_cast<float>(i + 1);
+  }
+  for (int i = 0; i < 32; ++i) {
+    for (int j = 0; j < 512; ++j) {
+      weight[i][j] = 1.0 / static_cast<float>(i + j + 1);
+    }
+  }
+  for (auto _ : state) {
+    for (int i = 0; i < 32; ++i) {
+      float sum = bias[i];
+      for (int j = 0; j < 512; ++j) {
+        sum += in[j] * weight[i][j];
+      }
+      out[i] = sum;
+    }
+  }
+  checkTrue(2.64 < out[0] && out[0] < 2.65);
+  checkTrue(1.49 < out[1] && out[1] < 1.50);
+  checkTrue(1.08 < out[2] && out[2] < 1.09);
+  checkTrue(0.85 < out[3] && out[3] < 0.86);
+}
+BENCHMARK(naive_linear_512_float);
 
 #ifdef USE_AVX2
 static void simdops_linear_512_int8_t(benchmark::State& state)
@@ -333,10 +360,10 @@ static void simdops_linear_512_int8_t(benchmark::State& state)
   for (auto _ : state) {
     simdops::linear<32, 512, 1>(out, in, weight, bias);
   }
-  checkTrue(out[0] == 1);
-  checkTrue(out[1] == 1);
-  checkTrue(out[30] == 38);
-  checkTrue(out[31] == 34);
+  checkTrue(out[0] == 116480);
+  checkTrue(out[1] == 114689);
+  checkTrue(out[30] == 113414);
+  checkTrue(out[31] == 114695);
 }
 BENCHMARK(simdops_linear_512_int8_t);
 #endif
