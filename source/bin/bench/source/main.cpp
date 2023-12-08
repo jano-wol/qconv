@@ -56,4 +56,43 @@ static void memset_zero_512_int8_t(benchmark::State& state)
 }
 BENCHMARK(memset_zero_512_int8_t);
 
+// copy
+static void naive_copy_512_int8_t(benchmark::State& state)
+{
+  int8_t a[512];
+  int8_t b[512];
+  dummyInit(a, 512);
+  for (auto _ : state) {
+    for (int i = 0; i < 512; ++i) {
+      b[i] = a[i];
+    }
+  }
+  checkTrue(b[1] == 1);
+}
+BENCHMARK(naive_copy_512_int8_t);
+
+static void simdops_copy_512_int8_t(benchmark::State& state)
+{
+  alignas(simdops::NativeAlignment) int8_t a[512];
+  alignas(simdops::NativeAlignment) int8_t b[512];
+  dummyInit(a, 512);
+  for (auto _ : state) {
+    simdops::copy<512, int8_t>(b, a);
+  }
+  checkTrue(b[1] == 1);
+}
+BENCHMARK(simdops_copy_512_int8_t);
+
+static void memcopy_copy_512_int8_t(benchmark::State& state)
+{
+  int8_t a[512];
+  int8_t b[512];
+  dummyInit(a, 512);
+  for (auto _ : state) {
+    std::memcpy(b, a, sizeof(int8_t) * 512);
+  }
+  checkTrue(b[1] == 1);
+}
+BENCHMARK(memcopy_copy_512_int8_t);
+
 BENCHMARK_MAIN();
