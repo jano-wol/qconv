@@ -1,4 +1,7 @@
 set(target demo)
 set(sources source/main.cpp)
 add_executable(${target} ${sources})
+get_target_property(target_options ${target} COMPILE_OPTIONS)
+list(REMOVE_ITEM target_options "-pedantic")
+set_property(TARGET ${target} PROPERTY COMPILE_OPTIONS ${target_options})
 target_link_libraries(${target} PUBLIC layers)
