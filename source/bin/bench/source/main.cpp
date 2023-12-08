@@ -95,4 +95,62 @@ static void memcopy_copy_512_int8_t(benchmark::State& state)
 }
 BENCHMARK(memcopy_copy_512_int8_t);
 
+// dilate
+static void naive_dilate_512_int8_t(benchmark::State& state)
+{
+  int8_t a[512];
+  int8_t b[512];
+  dummyInit(a, 512);
+  for (auto _ : state) {
+    for (int i = 0; i < 512; ++i) {
+      b[i] = a[i] + 1;
+    }
+  }
+  checkTrue(b[1] == 2);
+}
+BENCHMARK(naive_dilate_512_int8_t);
+
+static void simdops_dilate_512_int8_t(benchmark::State& state)
+{
+  alignas(simdops::NativeAlignment) int8_t a[512];
+  alignas(simdops::NativeAlignment) int8_t b[512];
+  dummyInit(a, 512);
+  for (auto _ : state) {
+    simdops::add<512, int8_t>(b, a, 1);
+  }
+  checkTrue(b[1] == 2);
+}
+BENCHMARK(simdops_dilate_512_int8_t);
+
+// add
+static void naive_add_512_int8_t(benchmark::State& state)
+{
+  int8_t a[512];
+  int8_t b[512];
+  int8_t c[512];
+  dummyInit(a, 512);
+  dummyInit(b, 512);
+  for (auto _ : state) {
+    for (int i = 0; i < 512; ++i) {
+      c[i] = a[i] + b[i];
+    }
+  }
+  checkTrue(c[2] == 4);
+}
+BENCHMARK(naive_add_512_int8_t);
+
+static void simdops_add_512_int8_t(benchmark::State& state)
+{
+  alignas(simdops::NativeAlignment) int8_t a[512];
+  alignas(simdops::NativeAlignment) int8_t b[512];
+  alignas(simdops::NativeAlignment) int8_t c[512];
+  dummyInit(a, 512);
+  dummyInit(b, 512);
+  for (auto _ : state) {
+    simdops::add<512, int8_t>(c, a, b);
+  }
+  checkTrue(c[2] == 4);
+}
+BENCHMARK(simdops_add_512_int8_t);
+
 BENCHMARK_MAIN();
