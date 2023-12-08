@@ -20,6 +20,22 @@ void mod8Init(T* a, int s)
   }
 }
 
+template <typename T>
+void weightInit_32_512(T a[32][512])
+{
+  for (int i = 0; i < 32; ++i) {
+    for (int j = 0; j < 512; ++j) {
+      a[i][j] = 0;
+    }
+  }
+  a[0][1] = 1;
+  a[1][0] = 2;
+  a[30][511] = 2;
+  a[31][510] = 1;
+  a[30][510] = 3;
+  a[31][511] = 3;
+}
+
 void checkTrue(bool check)
 {
   if (check == false) {
@@ -275,5 +291,54 @@ static void simdops_relu_512_int8_t(benchmark::State& state)
   checkTrue(b2[3] == 0);
 }
 BENCHMARK(simdops_relu_512_int8_t);
+
+// linear
+static void naive_linear_512_int8_t(benchmark::State& state)
+{
+  int8_t in[512];
+  int32_t bias[32];
+  int8_t weight[32][512];
+  int32_t out[32];
+
+  mod8Init(in, 512);
+  mod8Init(bias, 32);
+  weightInit_32_512(weight);
+  for (auto _ : state) {
+    for (int i = 0; i < 32; ++i) {
+      int sum = bias[i];
+      for (int j = 0; j < 512; ++j) {
+        sum += in[j] * weight[i][j];
+      }
+      out[i] = sum;
+    }
+  }
+  checkTrue(out[0] == 1);    // 1 * 1 + 0
+  checkTrue(out[1] == 1);    // 2 * 0 + 1
+  checkTrue(out[30] == 38);  // 3 * 6 + 2 * 7 + 6
+  checkTrue(out[31] == 34);  // 1 * 6 + 3 * 7 + 7
+}
+BENCHMARK(naive_linear_512_int8_t);
+
+#ifdef USE_AVX2
+static void simdops_linear_512_int8_t(benchmark::State& state)
+{
+  alignas(simdops::NativeAlignment) int8_t in[512];
+  alignas(simdops::NativeAlignment) int32_t bias[32];
+  alignas(simdops::NativeAlignment) int8_t weight[32][512];
+  alignas(simdops::NativeAlignment) int32_t out[32];
+
+  mod8Init(in, 512);
+  mod8Init(bias, 32);
+  weightInit_32_512(weight);
+  for (auto _ : state) {
+    simdops::linear<32, 512, 1>(out, in, weight, bias);
+  }
+  checkTrue(out[0] == 1);
+  checkTrue(out[1] == 1);
+  checkTrue(out[30] == 38);
+  checkTrue(out[31] == 34);
+}
+BENCHMARK(simdops_linear_512_int8_t);
+#endif
 
 BENCHMARK_MAIN();
