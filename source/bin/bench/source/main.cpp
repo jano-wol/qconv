@@ -16,7 +16,7 @@ BENCHMARK(naive_zero_512_int8_t);
 
 static void simdops_zero_512_int8_t(benchmark::State& state)
 {
-  int8_t a[512];
+  alignas(simdops::NativeAlignment) int8_t a[512];
   for (auto _ : state) {
     simdops::zero<512, int8_t>(a);
   }
