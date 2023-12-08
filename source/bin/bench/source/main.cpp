@@ -231,4 +231,49 @@ static void simdops_max_512_int8_t(benchmark::State& state)
 }
 BENCHMARK(simdops_max_512_int8_t);
 
+// relu
+static void naive_relu_512_int8_t(benchmark::State& state)
+{
+  int8_t a1[512];
+  int8_t a2[512];
+  int8_t b1[512];
+  int8_t b2[512];
+  constInit(a1, static_cast<int8_t>(4), 512);
+  constInit(a2, static_cast<int8_t>(-1), 512);
+  for (auto _ : state) {
+    for (int i = 0; i < 512; ++i) {
+      if (a1[i] >= 0) {
+        b1[i] = a1[i];
+      } else {
+        b1[i] = 0;
+      }
+      if (a2[i] >= 0) {
+        b2[i] = a2[i];
+      } else {
+        b2[i] = 0;
+      }
+    }
+  }
+  checkTrue(b1[3] == 4);
+  checkTrue(b2[3] == 0);
+}
+BENCHMARK(naive_relu_512_int8_t);
+
+static void simdops_relu_512_int8_t(benchmark::State& state)
+{
+  alignas(simdops::NativeAlignment) int8_t a1[512];
+  alignas(simdops::NativeAlignment) int8_t a2[512];
+  alignas(simdops::NativeAlignment) int8_t b1[512];
+  alignas(simdops::NativeAlignment) int8_t b2[512];
+  constInit(a1, static_cast<int8_t>(4), 512);
+  constInit(a2, static_cast<int8_t>(-1), 512);
+  for (auto _ : state) {
+    simdops::relu<512, int8_t>(b1, a1);
+    simdops::relu<512, int8_t>(b2, a2);
+  }
+  checkTrue(b1[3] == 4);
+  checkTrue(b2[3] == 0);
+}
+BENCHMARK(simdops_relu_512_int8_t);
+
 BENCHMARK_MAIN();
