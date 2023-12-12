@@ -276,6 +276,41 @@ static void simdops_max_512_int8_t(benchmark::State& state)
 }
 BENCHMARK(simdops_max_512_int8_t);
 
+// maxGlobal
+static void naive_max_global_512_int8_t(benchmark::State& state)
+{
+  int8_t a[512];
+  modInit(a, 512, 8);
+  a[321] = 71;
+  int8_t ret = 0;
+  for (auto _ : state) {
+    int8_t currMax = -128;
+    for (int i = 0; i < 512; ++i) {
+      if (a[i] >= currMax) {
+        currMax = a[i];
+      }
+    }
+    ret = currMax;
+  }
+  checkTrue(ret == 71);
+}
+BENCHMARK(naive_max_global_512_int8_t);
+
+#ifdef USE_AVX2
+static void simdops_max_global_512_int8_t(benchmark::State& state)
+{
+  alignas(simdops::NativeAlignment) int8_t a[512];
+  modInit(a, 512, 8);
+  a[321] = 71;
+  int8_t ret = 0;
+  for (auto _ : state) {
+    ret = simdops::maxGlobal<512>(a);
+  }
+  checkTrue(ret == 71);
+}
+BENCHMARK(simdops_max_global_512_int8_t);
+#endif
+
 // relu
 static void naive_relu_512_int8_t(benchmark::State& state)
 {
