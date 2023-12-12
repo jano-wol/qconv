@@ -206,6 +206,41 @@ static void simdops_min_512_int8_t(benchmark::State& state)
 }
 BENCHMARK(simdops_min_512_int8_t);
 
+// minGlobal
+static void naive_min_global_512_int8_t(benchmark::State& state)
+{
+  int8_t a[512];
+  modInit(a, 512, 8);
+  a[321] = -7;
+  int8_t ret = 0;
+  for (auto _ : state) {
+    int8_t currMin = 127;
+    for (int i = 0; i < 512; ++i) {
+      if (a[i] <= currMin) {
+        currMin = a[i];
+      }
+    }
+    ret = currMin;
+  }
+  checkTrue(ret == -7);
+}
+BENCHMARK(naive_min_global_512_int8_t);
+
+#ifdef USE_AVX2
+static void simdops_min_global_512_int8_t(benchmark::State& state)
+{
+  alignas(simdops::NativeAlignment) int8_t a[512];
+  modInit(a, 512, 8);
+  a[321] = -7;
+  int8_t ret = 0;
+  for (auto _ : state) {
+    ret = simdops::minGlobal<512>(a);
+  }
+  checkTrue(ret == -7);
+}
+BENCHMARK(simdops_min_global_512_int8_t);
+#endif
+
 // max
 static void naive_max_512_int8_t(benchmark::State& state)
 {

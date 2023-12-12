@@ -968,6 +968,29 @@ T* min(T* output, const T* input0, const T* input1)
   return output + B::NumBatch * B::RegWidth;
 }
 
+template <int Size, int Alignment = NativeAlignment, InstructionType Inst = NativeInstType>
+int8_t minGlobal(int8_t* input)
+{
+  static_assert(Inst == AVX2, "Only avx2 is supported now!");
+  static_assert(isAlignSizeOK(Alignment));
+  assert(isPtrAligned<Alignment>(input));
+
+  static_assert(Size % 32 == 0, "Size must be divisble by 32");
+
+  simde__m256i minValues = simde_mm256_loadu_si256((simde__m256i*)input);
+
+  for (size_t i = 32; i < Size; i += 32) {
+    const simde__m256i values = simde_mm256_loadu_si256((simde__m256i*)(input + i));
+    minValues = simde_mm256_min_epi8(values, minValues);
+  }
+  minValues = simde_mm256_min_epi8(minValues, simde_mm256_alignr_epi8(minValues, minValues, 1));
+  minValues = simde_mm256_min_epi8(minValues, simde_mm256_alignr_epi8(minValues, minValues, 2));
+  minValues = simde_mm256_min_epi8(minValues, simde_mm256_alignr_epi8(minValues, minValues, 4));
+  minValues = simde_mm256_min_epi8(minValues, simde_mm256_alignr_epi8(minValues, minValues, 8));
+  minValues = simde_mm256_min_epi8(minValues, simde_mm256_alignr_epi8(minValues, minValues, 16));
+  return simde_mm256_extract_epi8(minValues, 0);
+}
+
 template <int Size, typename T, int Alignment = NativeAlignment, InstructionType Inst = NativeInstType>
 T* max(T* output, const T* input0, const T* input1)
 {
