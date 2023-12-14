@@ -469,11 +469,17 @@ BENCHMARK(simdops_linear_512_float);
 //#ifdef USE_AVX2
 static void simdops_qconv(benchmark::State& state)
 {
-  alignas(simdops::NativeAlignment) int8_t in[512];
-  Layers::QConv<16, 16, 20, 3> q;
+  constexpr int SpatialIn = 16;
+  constexpr int SpatialOut = 16;
+  alignas(simdops::NativeAlignment) int8_t input[SpatialIn * SpatialOut * 20 * 20];
+  alignas(simdops::NativeAlignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
+  modInit(input, SpatialIn * SpatialOut * 20 * 20, 13);
+  modInit(weights, SpatialIn * SpatialOut * 3 * 3, 11);
+  Layers::QConv<SpatialIn, SpatialOut, 20, 3> q;
+  q.initWeights(weights);
 
   for (auto _ : state) {
-    q.propagate(in);
+    q.propagate(input);
   }
   checkTrue(1 == 1);
 }
