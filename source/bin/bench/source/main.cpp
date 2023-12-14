@@ -1,7 +1,9 @@
 #include <benchmark/benchmark.h>
 
 #include <core/simdops.h>
-#include <layers/add.h>
+#include <layers/qconv.h>
+
+using namespace qconv;
 
 // utils
 template <typename T>
@@ -463,5 +465,19 @@ static void simdops_linear_512_float(benchmark::State& state)
   checkTrue(0.85 < out[3] && out[3] < 0.86);
 }
 BENCHMARK(simdops_linear_512_float);
+
+//#ifdef USE_AVX2
+static void simdops_qconv(benchmark::State& state)
+{
+  alignas(simdops::NativeAlignment) int8_t in[512];
+  Layers::QConv<16, 16, 20, 3> q;
+
+  for (auto _ : state) {
+    q.propagate(in);
+  }
+  checkTrue(1 == 1);
+}
+BENCHMARK(simdops_qconv);
+//#endif
 
 BENCHMARK_MAIN();

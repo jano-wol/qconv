@@ -50,14 +50,6 @@
 
 namespace qconv::Layers
 {
-
-// Version of the evaluation file
-constexpr std::uint32_t Version = 0x7AF32F20u;
-
-// Constant used in evaluation value calculation
-constexpr int OutputScale = 64;
-constexpr int WeightScaleBits = 6;
-
 // Size of cache line (in bytes)
 constexpr std::size_t CacheLineSize = 64;
 
@@ -78,7 +70,6 @@ constexpr std::size_t SimdWidth = 16;
 constexpr std::size_t MaxSimdWidth = 32;
 
 // Type of input feature after conversion
-using InputType = float;
 using IndexType = std::uint32_t;
 
 }  // namespace qconv::Layers

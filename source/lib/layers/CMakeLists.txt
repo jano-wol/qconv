@@ -4,6 +4,7 @@ set(source_path "${CMAKE_CURRENT_SOURCE_DIR}/source")
 set(headers ${include_path}/add.h
             ${include_path}/bias.h
 			${include_path}/common.h
+            ${include_path}/qconv.h
 			${include_path}/tile.h
             )
 set(sources ${source_path}/tile.cpp
