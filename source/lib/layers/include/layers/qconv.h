@@ -1,8 +1,7 @@
 #ifndef QCONV_LAYERS_QCONV_H_INCLUDED
 #define QCONV_LAYERS_QCONV_H_INCLUDED
 
-#include <algorithm>
-#include <iostream>
+#include <fstream>
 
 #include <core/simdops.h>
 #include <layers/common.h>
@@ -48,7 +47,7 @@ public:
     std::stringstream ss(std::move(s));
     std::string curr;
     size_t idx = 0;
-    // WeightType weights[SpatialIn * SpatialOut * KernelSize * KernelSize];
+    WeightType weights[SpatialIn * SpatialOut * KernelSize * KernelSize];
     while (ss >> curr) {
       weights[idx] = std::stof(curr);
       ++idx;
@@ -70,14 +69,7 @@ public:
     }
   }
 
-  void initWeightsNaive(WeightType* w)
-  {
-    for (int i = 0; i < SpatialIn * SpatialOut * KernelSize * KernelSize; ++i) {
-      weights[i] = w[i];
-    }
-  }
-
-  void inline initEnv(InputType* input)
+  void initEnv(InputType* input)
   {
     for (int i = 0; i < SpatialSize * SpatialSize; ++i) {
       if (i == 0) {
@@ -129,28 +121,6 @@ public:
     }
   }
 
-  void inline propagateNaive(InputType* input)
-  {
-    for (size_t i = 0; i < SpatialSize * SpatialSize; ++i) {
-      for (size_t j = 0; j < SpatialOut; ++j) {
-        size_t w = j * SpatialIn * KernelSize * KernelSize;
-        int sum = 0;
-        for (int m = 0; m < 10; ++m) {
-          int g = conv_global[1][i][m];
-          int l = conv_rel_global[1][i][m];
-          if (g == -1) {
-            break;
-          }
-          for (int k = 0; k < SpatialIn; ++k) {
-            sum += input[k * SpatialSize * SpatialSize + g] * weights[w + k * KernelSize * KernelSize + l];
-          }
-        }
-        outputBuf[j * SpatialSize * SpatialSize + i] = sum;
-      }
-    }
-  }
-
-  alignas(Alignment) WeightType weights[SpatialIn * SpatialOut * KernelSize * KernelSize];
   alignas(Alignment) simde__m256i weightsEnv[SpatialIn * SpatialOut];
   alignas(Alignment) WeightType weightsC[SpatialIn * SpatialOut];
   alignas(Alignment) simde__m256i env[SpatialSize * SpatialSize];
