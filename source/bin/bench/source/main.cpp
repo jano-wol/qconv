@@ -469,7 +469,7 @@ static void simdops_qconv_naive(benchmark::State& state)
   constexpr int SpatialOut = 16;
   alignas(simdops::NativeAlignment) int8_t input[SpatialIn * SpatialOut * 20 * 20];
   alignas(simdops::NativeAlignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
-  modInit(input, SpatialIn * SpatialOut * 20 * 20, 13);
+  modInit(input, SpatialIn * 20 * 20, 13);
   modInit(weights, SpatialIn * SpatialOut * 3 * 3, 11);
   QConvNaive<SpatialIn, SpatialOut, 20, 3> q;
   q.initWeights(weights);

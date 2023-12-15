@@ -20,9 +20,9 @@ void testQConvNaive()
   std::string context = "testQConvNaive";
   constexpr int SpatialIn = 16;
   constexpr int SpatialOut = 16;
-  alignas(NativeAlignment) int8_t input[SpatialIn * SpatialOut * 20 * 20];
+  alignas(NativeAlignment) int8_t input[SpatialIn * 20 * 20];
   alignas(NativeAlignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
-  constInit(input, SpatialIn * SpatialOut * 20 * 20, static_cast<int8_t>(1));
+  constInit(input, SpatialIn * 20 * 20, static_cast<int8_t>(1));
   constInit(weights, SpatialIn * SpatialOut * 3 * 3, static_cast<int16_t>(1));
   QConvNaive<SpatialIn, SpatialOut, 20, 3> q;
 
@@ -47,6 +47,23 @@ void testQConvNaive()
   checkTest(q.outputBuf[19], 10, context);
   checkTest(q.outputBuf[210], -150, context);
   checkTest(q.outputBuf[5 * 20 * 20 + 210], 144, context);
+
+  constInit(weights, SpatialIn * SpatialOut * 3 * 3, static_cast<int16_t>(1));
+  std::memcpy(weights + 5 * 9, weightsNew, 9 * sizeof(int16_t));
+  q.initWeights(weights);
+  q.propagate(input);
+  checkTest(q.outputBuf[0], 73, context);
+  checkTest(q.outputBuf[5 * 20 * 20 + 210], 144, context);
+
+  constInit(weights, SpatialIn * SpatialOut * 3 * 3, static_cast<int16_t>(1));
+  std::memcpy(weights + 16 * 5 * 9, weightsNew, 9 * sizeof(int16_t));
+  q.initWeights(weights);
+  q.propagate(input);
+  checkTest(q.outputBuf[0], 64, context);
+  checkTest(q.outputBuf[5 * 20 * 20 + 19], 10, context);
+  checkTest(q.outputBuf[5 * 20 * 20 + 210], -150, context);
+
+  constInit(weights, SpatialIn * SpatialOut * 3 * 3, static_cast<int16_t>(1));
 }
 
 int main()
