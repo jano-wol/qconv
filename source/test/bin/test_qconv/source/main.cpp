@@ -24,44 +24,44 @@ void testQConvNaive()
   alignas(NativeAlignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
   constInit(input, SpatialIn * 20 * 20, static_cast<int8_t>(1));
   constInit(weights, SpatialIn * SpatialOut * 3 * 3, static_cast<int16_t>(1));
-  QConvNaive<SpatialIn, SpatialOut, 20, 3> q;
+  QConvNaive<SpatialIn, SpatialOut, 20, 3> qN;
 
-  q.initWeights(weights);
-  q.propagate(input);
-  checkTest(q.outputBuf[0], 64, context);
-  checkTest(q.outputBuf[20 * 20 + 1], 96, context);
-  checkTest(q.outputBuf[2 * 20 * 20 + 19], 64, context);
-  checkTest(q.outputBuf[2 * 20 * 20 + 20], 96, context);
-  checkTest(q.outputBuf[3 * 20 * 20 + 21], 144, context);
-  checkTest(q.outputBuf[5 * 20 * 20 + 210], 144, context);
-  checkTest(q.outputBuf[6 * 20 * 20 + 19 * 20], 64, context);
-  checkTest(q.outputBuf[8 * 20 * 20 + 19 * 20 + 1], 96, context);
-  checkTest(q.outputBuf[15 * 20 * 20 + 20 * 20 - 1], 64, context);
+  qN.initWeights(weights);
+  qN.propagate(input);
+  checkTest(qN.outputBuf[0], 64, context);
+  checkTest(qN.outputBuf[20 * 20 + 1], 96, context);
+  checkTest(qN.outputBuf[2 * 20 * 20 + 19], 64, context);
+  checkTest(qN.outputBuf[2 * 20 * 20 + 20], 96, context);
+  checkTest(qN.outputBuf[3 * 20 * 20 + 21], 144, context);
+  checkTest(qN.outputBuf[5 * 20 * 20 + 210], 144, context);
+  checkTest(qN.outputBuf[6 * 20 * 20 + 19 * 20], 64, context);
+  checkTest(qN.outputBuf[8 * 20 * 20 + 19 * 20 + 1], 96, context);
+  checkTest(qN.outputBuf[15 * 20 * 20 + 20 * 20 - 1], 64, context);
 
   int16_t weightsNew[9] = {-90, -80, -70, -60, 5, 1, 2, 3, 4};
   std::memcpy(weights, weightsNew, 9 * sizeof(int16_t));
-  q.initWeights(weights);
-  q.propagate(input);
-  checkTest(q.outputBuf[0], 73, context);
-  checkTest(q.outputBuf[1], 45, context);
-  checkTest(q.outputBuf[19], 10, context);
-  checkTest(q.outputBuf[210], -150, context);
-  checkTest(q.outputBuf[5 * 20 * 20 + 210], 144, context);
+  qN.initWeights(weights);
+  qN.propagate(input);
+  checkTest(qN.outputBuf[0], 73, context);
+  checkTest(qN.outputBuf[1], 45, context);
+  checkTest(qN.outputBuf[19], 10, context);
+  checkTest(qN.outputBuf[210], -150, context);
+  checkTest(qN.outputBuf[5 * 20 * 20 + 210], 144, context);
 
   constInit(weights, SpatialIn * SpatialOut * 3 * 3, static_cast<int16_t>(1));
   std::memcpy(weights + 5 * 9, weightsNew, 9 * sizeof(int16_t));
-  q.initWeights(weights);
-  q.propagate(input);
-  checkTest(q.outputBuf[0], 73, context);
-  checkTest(q.outputBuf[5 * 20 * 20 + 210], 144, context);
+  qN.initWeights(weights);
+  qN.propagate(input);
+  checkTest(qN.outputBuf[0], 73, context);
+  checkTest(qN.outputBuf[5 * 20 * 20 + 210], 144, context);
 
   constInit(weights, SpatialIn * SpatialOut * 3 * 3, static_cast<int16_t>(1));
   std::memcpy(weights + 16 * 5 * 9, weightsNew, 9 * sizeof(int16_t));
-  q.initWeights(weights);
-  q.propagate(input);
-  checkTest(q.outputBuf[0], 64, context);
-  checkTest(q.outputBuf[5 * 20 * 20 + 19], 10, context);
-  checkTest(q.outputBuf[5 * 20 * 20 + 210], -150, context);
+  qN.initWeights(weights);
+  qN.propagate(input);
+  checkTest(qN.outputBuf[0], 64, context);
+  checkTest(qN.outputBuf[5 * 20 * 20 + 19], 10, context);
+  checkTest(qN.outputBuf[5 * 20 * 20 + 210], -150, context);
 
   constInit(weights, SpatialIn * SpatialOut * 3 * 3, static_cast<int16_t>(1));
   int8_t inputLayer[20 * 20];
@@ -73,11 +73,11 @@ void testQConvNaive()
     }
   }
   std::memcpy(input, inputLayer, 20 * 20 * sizeof(int8_t));
-  q.initWeights(weights);
-  q.propagate(input);
-  checkTest(q.outputBuf[0], -132, context);
-  checkTest(q.outputBuf[250], 132, context);
-  checkTest(q.outputBuf[20 * 20 * 10 + 250], 132, context);
+  qN.initWeights(weights);
+  qN.propagate(input);
+  checkTest(qN.outputBuf[0], -132, context);
+  checkTest(qN.outputBuf[250], 132, context);
+  checkTest(qN.outputBuf[20 * 20 * 10 + 250], 132, context);
 }
 
 int main()
