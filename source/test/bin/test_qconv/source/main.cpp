@@ -32,6 +32,7 @@ void testQConv()
   q.propagate(input);
   qN.initWeights(weights);
   qN.propagate(input);
+  checkTest(q.outputBuf[0], 64, context);
   checkTest(qN.outputBuf[0], 64, contextN);
   checkTest(qN.outputBuf[20 * 20 + 1], 96, contextN);
   checkTest(qN.outputBuf[2 * 20 * 20 + 19], 64, contextN);
@@ -59,7 +60,7 @@ void testQConv()
   q.initWeights(weights);
   q.propagate(input);
   qN.initWeights(weights);
-  qN.propagate(input);  
+  qN.propagate(input);
   checkTest(qN.outputBuf[0], 73, contextN);
   checkTest(qN.outputBuf[5 * 20 * 20 + 210], 144, contextN);
 
@@ -68,7 +69,7 @@ void testQConv()
   q.initWeights(weights);
   q.propagate(input);
   qN.initWeights(weights);
-  qN.propagate(input);  
+  qN.propagate(input);
   checkTest(qN.outputBuf[0], 64, contextN);
   checkTest(qN.outputBuf[5 * 20 * 20 + 19], 10, contextN);
   checkTest(qN.outputBuf[5 * 20 * 20 + 210], -150, contextN);

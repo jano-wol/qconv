@@ -1,6 +1,8 @@
 #ifndef QCONV_CORE_UTILS_H_
 #define QCONV_CORE_UTILS_H_
 
+#include <core/simdops.h>
+
 namespace qconv::core
 {
 template <typename T>
@@ -28,6 +30,10 @@ void weightInit_32_512(T a[32][512])
     }
   }
 }
+
+void printAs32s(simde__m256i v);
+void printAs16s(simde__m256i v);
+void printAs8s(simde__m256i v);
 }  // namespace qconv::core
 
 #endif  // QCONV_CORE_UTILS_H_
