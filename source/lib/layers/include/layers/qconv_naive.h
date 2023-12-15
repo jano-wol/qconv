@@ -12,6 +12,8 @@ template <IndexType SpatialIn, IndexType SpatialOut, IndexType SpatialSize, Inde
 class QConvNaive
 {
 public:
+  static_assert(SpatialSize == BOARDS, "Naive implementation depends on Tiles!");
+  static_assert(KernelSize == 3, "Only 3x3 kernels are supported now!");
   using InputType = int8_t;
   using OutputType = int32_t;
   using WeightType = int16_t;
@@ -24,15 +26,18 @@ public:
     std::stringstream ss(std::move(s));
     std::string curr;
     size_t idx = 0;
+    WeightType w[SpatialIn * SpatialOut * KernelSize * KernelSize];
     while (ss >> curr) {
       weights[idx] = std::stof(curr);
       ++idx;
     }
+    initWeights(w);
     return !stream.fail();
   }
 
   void initWeights(WeightType* w)
   {
+    initTiles();
     for (int i = 0; i < SpatialIn * SpatialOut * KernelSize * KernelSize; ++i) {
       weights[i] = w[i];
     }
@@ -45,8 +50,8 @@ public:
         size_t w = j * SpatialIn * KernelSize * KernelSize;
         int sum = 0;
         for (int m = 0; m < 10; ++m) {
-          int g = conv_global[1][i][m];
-          int l = conv_rel_global[1][i][m];
+          int g = tileAbsolute[1][i][m];
+          int l = tileRelative[1][i][m];
           if (g == -1) {
             break;
           }

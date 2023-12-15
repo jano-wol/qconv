@@ -473,7 +473,6 @@ static void simdops_qconv_naive(benchmark::State& state)
   modInit(weights, SpatialIn * SpatialOut * 3 * 3, 11);
   QConvNaive<SpatialIn, SpatialOut, 20, 3> q;
   q.initWeights(weights);
-  init();
 
   for (auto _ : state) {
     q.propagate(input);

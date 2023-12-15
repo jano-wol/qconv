@@ -34,7 +34,6 @@ void testQConvNaive()
 
 int main()
 {
-  init();
   testQConvNaive();
   return 0;
 }

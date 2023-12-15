@@ -30,8 +30,8 @@ public:
   {
     if (update) {
       for (size_t i = 0; i < SpatialOut; ++i) {
-        for (size_t j = 0; conv_global[r][c][j] != -1; ++j) {
-          int k = i * SpatialSize * SpatialSize + conv_global[r][c][j];
+        for (size_t j = 0; tileAbsolute[r][c][j] != -1; ++j) {
+          int k = i * SpatialSize * SpatialSize + tileAbsolute[r][c][j];
           outputBuf[k] = input1[k] + input2[k];
         }
       }
