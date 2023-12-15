@@ -64,6 +64,20 @@ void testQConvNaive()
   checkTest(q.outputBuf[5 * 20 * 20 + 210], -150, context);
 
   constInit(weights, SpatialIn * SpatialOut * 3 * 3, static_cast<int16_t>(1));
+  int8_t inputLayer[20 * 20];
+  int8_t val = -50;
+  for (int i = 0; i < 20 * 20; ++i) {
+    inputLayer[i] = val;
+    if (i % 5 == 4) {
+      ++val;
+    }
+  }
+  std::memcpy(input, inputLayer, 20 * 20 * sizeof(int8_t));
+  q.initWeights(weights);
+  q.propagate(input);
+  checkTest(q.outputBuf[0], -132, context);
+  checkTest(q.outputBuf[250], 132, context);
+  checkTest(q.outputBuf[20 * 20 * 10 + 250], 132, context);
 }
 
 int main()
