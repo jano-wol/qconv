@@ -47,12 +47,12 @@ public:
     std::stringstream ss(std::move(s));
     std::string curr;
     size_t idx = 0;
-    WeightType weights[SpatialIn * SpatialOut * KernelSize * KernelSize];
+    WeightType w[SpatialIn * SpatialOut * KernelSize * KernelSize];
     while (ss >> curr) {
-      weights[idx] = std::stof(curr);
+      w[idx] = std::stof(curr);
       ++idx;
     }
-    initWeights(weights);
+    initWeights(w);
     return !stream.fail();
   }
 
