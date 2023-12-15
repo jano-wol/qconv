@@ -1,9 +1,9 @@
 #include <layers/tile.h>
 
-int qconv::Layers::conv_global[7][TSIZE][15 * 15 + 1];
-int qconv::Layers::conv_rel_global[7][TSIZE][15 * 15 + 1];
+int qconv::layers::conv_global[7][TSIZE][15 * 15 + 1];
+int qconv::layers::conv_rel_global[7][TSIZE][15 * 15 + 1];
 
-void qconv::Layers::init()
+void qconv::layers::init()
 {
   for (int k = 0; k < 7; ++k) {
     for (int c = 0; c < TSIZE; ++c) {

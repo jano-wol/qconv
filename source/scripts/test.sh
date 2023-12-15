@@ -1,10 +1,7 @@
 #!/bin/bash
 set -ex
 source "$(dirname "${0}")/build/init.sh"
-source "$(dirname "${0}")/test/nnue_zero.sh"
-source "$(dirname "${0}")/test/generate_dummy_data.sh"
-source "$(dirname "${0}")/test/load_dummy_data.sh"
-source "$(dirname "${0}")/test/generate_dummy_nnue.sh"
-source "$(dirname "${0}")/test/nnue_load.sh"
+${BUILD_FOLDER}/test/bin/test_qconv
+echo "Qconv tests passed"
 echo "All tests passed"
 

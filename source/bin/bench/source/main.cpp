@@ -1,37 +1,14 @@
 #include <benchmark/benchmark.h>
 
 #include <core/simdops.h>
+#include <core/utils.h>
 #include <layers/qconv.h>
 
 using namespace qconv;
+using namespace qconv::core;
+using namespace qconv::layers;
 
 // utils
-template <typename T>
-void constInit(T* a, T v, int s)
-{
-  for (int i = 0; i < s; ++i) {
-    a[i] = v;
-  }
-}
-
-template <typename T>
-void modInit(T* a, int s, int mod)
-{
-  for (int i = 0; i < s; ++i) {
-    a[i] = i % mod;
-  }
-}
-
-template <typename T>
-void weightInit_32_512(T a[32][512])
-{
-  for (int i = 0; i < 32; ++i) {
-    for (int j = 0; j < 512; ++j) {
-      a[i][j] = (i + j) % 128;
-    }
-  }
-}
-
 void checkTrue(bool check)
 {
   if (check == false) {
@@ -475,7 +452,7 @@ static void simdops_qconv(benchmark::State& state)
   alignas(simdops::NativeAlignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
   modInit(input, SpatialIn * SpatialOut * 20 * 20, 13);
   modInit(weights, SpatialIn * SpatialOut * 3 * 3, 11);
-  Layers::QConv<SpatialIn, SpatialOut, 20, 3> q;
+  QConv<SpatialIn, SpatialOut, 20, 3> q;
   q.initWeights(weights);
 
   for (auto _ : state) {
@@ -493,9 +470,9 @@ static void simdops_qconv_naive(benchmark::State& state)
   alignas(simdops::NativeAlignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
   modInit(input, SpatialIn * SpatialOut * 20 * 20, 13);
   modInit(weights, SpatialIn * SpatialOut * 3 * 3, 11);
-  Layers::QConv<SpatialIn, SpatialOut, 20, 3> q;
+  QConv<SpatialIn, SpatialOut, 20, 3> q;
   q.initWeightsNaive(weights);
-  Layers::init();
+  init();
 
   for (auto _ : state) {
     q.propagateNaive(input);

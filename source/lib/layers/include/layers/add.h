@@ -8,7 +8,7 @@
 #include <layers/common.h>
 #include <layers/tile.h>
 
-namespace qconv::Layers
+namespace qconv::layers
 {
 template <IndexType SpatialOut, IndexType SpatialSize>
 class AddTransform
@@ -44,6 +44,6 @@ public:
 
   OutputBuffer outputBuf;
 };
-}  // namespace qconv::Layers
+}  // namespace qconv::layers
 
 #endif  // #ifndef QCONV_LAYERS_ADD_H_INCLUDED

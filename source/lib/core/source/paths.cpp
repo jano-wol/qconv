@@ -2,7 +2,7 @@
 #define STRINGIZE(x) STRINGIZE2(x)
 #include <core/paths.h>
 
-using namespace barbakan;
+using namespace qconv;
 
 std::string core::getRepoFolder()
 {
