@@ -30,7 +30,7 @@
 #define UNLIKELY(x) (x)
 #endif
 
-namespace simdops
+namespace qconv::simdops
 {
 
 enum InstructionType {
