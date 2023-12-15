@@ -4,7 +4,7 @@
 namespace qconv::core
 {
 template <typename T>
-void constInit(T* a, T v, int s)
+void constInit(T* a, int s, T v)
 {
   for (int i = 0; i < s; ++i) {
     a[i] = v;

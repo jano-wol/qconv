@@ -157,7 +157,7 @@ static void naive_min_512_int8_t(benchmark::State& state)
   int8_t a[512];
   int8_t b[512];
   int8_t c[512];
-  constInit(a, static_cast<int8_t>(4), 512);
+  constInit(a, 512, static_cast<int8_t>(4));
   modInit(b, 512, 11);
   for (auto _ : state) {
     for (int i = 0; i < 512; ++i) {
@@ -177,7 +177,7 @@ static void simdops_min_512_int8_t(benchmark::State& state)
   alignas(simdops::NativeAlignment) int8_t a[512];
   alignas(simdops::NativeAlignment) int8_t b[512];
   alignas(simdops::NativeAlignment) int8_t c[512];
-  constInit(a, static_cast<int8_t>(4), 512);
+  constInit(a, 512, static_cast<int8_t>(4));
   modInit(b, 512, 11);
   for (auto _ : state) {
     simdops::min<512, int8_t>(c, a, b);
@@ -227,7 +227,7 @@ static void naive_max_512_int8_t(benchmark::State& state)
   int8_t a[512];
   int8_t b[512];
   int8_t c[512];
-  constInit(a, static_cast<int8_t>(4), 512);
+  constInit(a, 512, static_cast<int8_t>(4));
   modInit(b, 512, 11);
   for (auto _ : state) {
     for (int i = 0; i < 512; ++i) {
@@ -247,7 +247,7 @@ static void simdops_max_512_int8_t(benchmark::State& state)
   alignas(simdops::NativeAlignment) int8_t a[512];
   alignas(simdops::NativeAlignment) int8_t b[512];
   alignas(simdops::NativeAlignment) int8_t c[512];
-  constInit(a, static_cast<int8_t>(4), 512);
+  constInit(a, 512, static_cast<int8_t>(4));
   modInit(b, 512, 11);
   for (auto _ : state) {
     simdops::max<512, int8_t>(c, a, b);
@@ -298,8 +298,8 @@ static void naive_relu_512_int8_t(benchmark::State& state)
   int8_t a2[512];
   int8_t b1[512];
   int8_t b2[512];
-  constInit(a1, static_cast<int8_t>(4), 512);
-  constInit(a2, static_cast<int8_t>(-1), 512);
+  constInit(a1, 512, static_cast<int8_t>(4));
+  constInit(a2, 512, static_cast<int8_t>(-1));
   for (auto _ : state) {
     for (int i = 0; i < 512; ++i) {
       if (a1[i] >= 0) {
@@ -325,8 +325,8 @@ static void simdops_relu_512_int8_t(benchmark::State& state)
   alignas(simdops::NativeAlignment) int8_t a2[512];
   alignas(simdops::NativeAlignment) int8_t b1[512];
   alignas(simdops::NativeAlignment) int8_t b2[512];
-  constInit(a1, static_cast<int8_t>(4), 512);
-  constInit(a2, static_cast<int8_t>(-1), 512);
+  constInit(a1, 512, static_cast<int8_t>(4));
+  constInit(a2, 512, static_cast<int8_t>(-1));
   for (auto _ : state) {
     simdops::relu<512, int8_t>(b1, a1);
     simdops::relu<512, int8_t>(b2, a2);

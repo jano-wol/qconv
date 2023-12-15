@@ -1,26 +1,26 @@
-
 #include <core/utils.h>
 #include <layers/qconv.h>
+#include <layers/qconv_naive.h>
 
 using namespace qconv;
 using namespace qconv::core;
 using namespace qconv::layers;
 using namespace qconv::simdops;
 
-void test1()
+void testQConvNaive()
 {
   constexpr int SpatialIn = 16;
   constexpr int SpatialOut = 16;
   alignas(NativeAlignment) int8_t input[SpatialIn * SpatialOut * 20 * 20];
   alignas(NativeAlignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
-  modInit(input, SpatialIn * SpatialOut * 20 * 20, 13);
-  modInit(weights, SpatialIn * SpatialOut * 3 * 3, 11);
-  QConv<SpatialIn, SpatialOut, 20, 3> q;
+  constInit(input, SpatialIn * SpatialOut * 20 * 20, static_cast<int8_t>(1));
+  constInit(weights, SpatialIn * SpatialOut * 3 * 3, static_cast<int16_t>(1));
+  QConvNaive<SpatialIn, SpatialOut, 20, 3> q;
   q.initWeights(weights);
 }
 
 int main()
 {
-  test1();
+  testQConvNaive();
   return 0;
 }
