@@ -16,8 +16,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef QCONV_LAYERS_BIAS_H_INCLUDED
-#define QCONV_LAYERS_BIAS_H_INCLUDED
+#ifndef QCONV_LAYERS_QCONV_H_INCLUDED
+#define QCONV_LAYERS_QCONV_H_INCLUDED
 
 #include <algorithm>
 #include <iostream>
@@ -25,6 +25,24 @@
 #include <core/simdops.h>
 #include <layers/common.h>
 #include <layers/tile.h>
+
+static inline int32_t hsum_epi32(simde__m128i x)
+{
+  simde__m128i hi64 =
+      simde_mm_unpackhi_epi64(x, x);  // 3-operand non-destructive AVX lets us save a byte without needing a movdqa
+  simde__m128i sum64 = simde_mm_add_epi32(hi64, x);
+  simde__m128i hi32 = simde_mm_shuffle_epi32(sum64, _MM_SHUFFLE(2, 3, 0, 1));  // Swap the low two elements
+  simde__m128i sum32 = simde_mm_add_epi32(sum64, hi32);
+  return simde_mm_cvtsi128_si32(sum32);  // movd
+}
+
+static inline int32_t hsum_8x32(simde__m256i v)
+{
+  __m128i sum128 = simde_mm_add_epi32(
+      simde_mm256_castsi256_si128(v),
+      simde_mm256_extracti128_si256(v, 1));  // silly GCC uses a longer AXV512VL instruction if AVX512 is enabled :/
+  return hsum_epi32(sum128);
+}
 
 namespace qconv::Layers
 {
@@ -48,7 +66,7 @@ public:
     std::stringstream ss(std::move(s));
     std::string curr;
     size_t idx = 0;
-    WeightType weights[SpatialIn * SpatialOut * KernelSize * KernelSize];
+    // WeightType weights[SpatialIn * SpatialOut * KernelSize * KernelSize];
     while (ss >> curr) {
       weights[idx] = std::stof(curr);
       ++idx;
@@ -70,7 +88,14 @@ public:
     }
   }
 
-  void initEnv(InputType* input)
+  void initWeightsNaive(WeightType* w)
+  {
+    for (int i = 0; i < SpatialIn * SpatialOut * KernelSize * KernelSize; ++i) {
+      weights[i] = w[i];
+    }
+  }
+
+  void inline initEnv(InputType* input)
   {
     for (int i = 0; i < SpatialSize * SpatialSize; ++i) {
       if (i == 0) {
@@ -109,11 +134,41 @@ public:
   void propagate(InputType* input)
   {
     memset(outputBuf, 0, SpatialOut * SpatialSize * SpatialSize * sizeof(OutputType));
-    for (int i = 0; i < SpatialIn; i++) {
+    for (int i = 0; i < SpatialIn; ++i) {
       initEnv(input + i * SpatialSize * SpatialSize);
+      for (int j = 0; j < SpatialOut; ++j) {
+        auto w = weightsEnv[i * SpatialOut + j];
+        for (int k = 0; k < SpatialSize * SpatialSize; ++k) {
+          auto x = simde_mm256_mullo_epi32(env[k], w);
+          auto y = hsum_8x32(x);
+          outputBuf[j * SpatialSize * SpatialSize + k] += y;
+        }
+      }
     }
   }
 
+  void inline propagateNaive(InputType* input)
+  {
+    for (size_t i = 0; i < SpatialSize * SpatialSize; ++i) {
+      for (size_t j = 0; j < SpatialOut; ++j) {
+        size_t w = j * SpatialIn * KernelSize * KernelSize;
+        int sum = 0;
+        for (int m = 0; m < 10; ++m) {
+          int g = conv_global[1][i][m];
+          int l = conv_rel_global[1][i][m];
+          if (g == -1) {
+            break;
+          }
+          for (int k = 0; k < SpatialIn; ++k) {
+            sum += input[k * SpatialSize * SpatialSize + g] * weights[w + k * KernelSize * KernelSize + l];
+          }
+        }
+        outputBuf[j * SpatialSize * SpatialSize + i] = sum;
+      }
+    }
+  }
+
+  alignas(Alignment) WeightType weights[SpatialIn * SpatialOut * KernelSize * KernelSize];
   alignas(Alignment) simde__m256i weightsEnv[SpatialIn * SpatialOut];
   alignas(Alignment) WeightType weightsC[SpatialIn * SpatialOut];
   alignas(Alignment) simde__m256i env[SpatialSize * SpatialSize];
@@ -121,4 +176,4 @@ public:
 };
 }  // namespace qconv::Layers
 
-#endif  // #ifndef QCONV_LAYERS_BIAS_H_INCLUDED
+#endif  // #ifndef QCONV_LAYERS_QCONV_H_INCLUDED

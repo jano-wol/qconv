@@ -484,6 +484,25 @@ static void simdops_qconv(benchmark::State& state)
   checkTrue(1 == 1);
 }
 BENCHMARK(simdops_qconv);
+
+static void simdops_qconv_naive(benchmark::State& state)
+{
+  constexpr int SpatialIn = 16;
+  constexpr int SpatialOut = 16;
+  alignas(simdops::NativeAlignment) int8_t input[SpatialIn * SpatialOut * 20 * 20];
+  alignas(simdops::NativeAlignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
+  modInit(input, SpatialIn * SpatialOut * 20 * 20, 13);
+  modInit(weights, SpatialIn * SpatialOut * 3 * 3, 11);
+  Layers::QConv<SpatialIn, SpatialOut, 20, 3> q;
+  q.initWeightsNaive(weights);
+  Layers::init();
+
+  for (auto _ : state) {
+    q.propagateNaive(input);
+  }
+  checkTrue(q.outputBuf[0] != 1);
+}
+BENCHMARK(simdops_qconv_naive);
 //#endif
 
 BENCHMARK_MAIN();

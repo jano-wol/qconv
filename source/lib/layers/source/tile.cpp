@@ -1,7 +1,7 @@
 #include <layers/tile.h>
 
-int conv_global[7][TSIZE][15 * 15 + 1];
-int conv_rel_global[7][TSIZE][15 * 15 + 1];
+int qconv::Layers::conv_global[7][TSIZE][15 * 15 + 1];
+int qconv::Layers::conv_rel_global[7][TSIZE][15 * 15 + 1];
 
 void qconv::Layers::init()
 {
