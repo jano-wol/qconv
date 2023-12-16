@@ -36,10 +36,6 @@ public:
   static_assert(Inst == simdops::InstructionType::AVX2, "Only avx2 is supported now!");
   static_assert(KernelSize == 3, "Only 3x3 kernels are supported now!");
   static_assert(simdops::isAlignSizeOK(Alignment));
-  using InputType = int8_t;
-  using OutputType = int32_t;
-  using WeightType = int16_t;
-  using OutputBuffer = OutputType[SpatialOut * SpatialSize * SpatialSize];
 
   bool read_parameters(std::istream& stream)
   {
@@ -48,7 +44,7 @@ public:
     std::stringstream ss(std::move(s));
     std::string curr;
     size_t idx = 0;
-    WeightType w[SpatialIn * SpatialOut * KernelSize * KernelSize];
+    int16_t w[SpatialIn * SpatialOut * KernelSize * KernelSize];
     while (ss >> curr) {
       w[idx] = std::stof(curr);
       ++idx;
@@ -57,7 +53,7 @@ public:
     return !stream.fail();
   }
 
-  void initWeights(WeightType* w)
+  void initWeights(int16_t* w)
   {
     size_t weightsEnvIdx = 0;
     size_t weightsCIdx = 0;
@@ -70,7 +66,7 @@ public:
     }
   }
 
-  void initEnv(InputType* input)
+  void initEnv(int8_t* input)
   {
     for (int i = 0; i < SpatialSize * SpatialSize; ++i) {
       if (i == 0) {
@@ -106,9 +102,9 @@ public:
   }
 
   // Forward propagation
-  void propagate(InputType* input)
+  void propagate(int8_t* input)
   {
-    memset(outputBuf, 0, SpatialOut * SpatialSize * SpatialSize * sizeof(OutputType));
+    memset(outputBuf, 0, SpatialOut * SpatialSize * SpatialSize * sizeof(int32_t));
     for (int i = 0; i < SpatialIn; ++i) {
       initEnv(input + i * SpatialSize * SpatialSize);
       for (int j = 0; j < SpatialOut; ++j) {
@@ -121,25 +117,25 @@ public:
 
         typedef simdops::detail::VecOp<int32_t, Inst> Op;
         typedef simdops::detail::VecLoadStore<int32_t, Alignment, Inst> LS;
-        auto C = Op::set1(static_cast<OutputType>(weightsC[j * SpatialIn + i]));
+        auto C = Op::set1(static_cast<int32_t>(weightsC[j * SpatialIn + i]));
         for (int b = 0; b < SpatialSize * SpatialSize / 8; ++b) {
           auto data =
               simde_mm256_setr_epi32(input[i * 400 + b * 8], input[i * 400 + b * 8 + 1], input[i * 400 + b * 8 + 2],
                                      input[i * 400 + b * 8 + 3], input[i * 400 + b * 8 + 4], input[i * 400 + b * 8 + 5],
                                      input[i * 400 + b * 8 + 6], input[i * 400 + b * 8 + 7]);
           data = simde_mm256_mullo_epi32(data, C);
-          auto data2 = LS::load(outputBuf + j * SpatialSize * SpatialSize + b * 8);
-          data = Op::add(data, data2);
-          LS::store(outputBuf + j * SpatialSize * SpatialSize + b * 8, data);
+          auto outputPart = LS::load(outputBuf + j * SpatialSize * SpatialSize + b * 8);
+          outputPart = Op::add(data, outputPart);
+          LS::store(outputBuf + j * SpatialSize * SpatialSize + b * 8, outputPart);
         }
       }
     }
   }
 
   alignas(Alignment) simde__m256i weightsEnv[SpatialIn * SpatialOut];
-  alignas(Alignment) WeightType weightsC[SpatialIn * SpatialOut];
+  alignas(Alignment) int16_t weightsC[SpatialIn * SpatialOut];
   alignas(Alignment) simde__m256i env[SpatialSize * SpatialSize];
-  alignas(Alignment) OutputBuffer outputBuf;
+  alignas(Alignment) int32_t outputBuf[SpatialOut * SpatialSize * SpatialSize];
 };
 }  // namespace qconv::layers
 
