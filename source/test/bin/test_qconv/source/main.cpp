@@ -57,10 +57,15 @@ void testQConv()
   q.propagate(input);
   qN.initWeights(weights);
   qN.propagate(input);
+  checkTest(q.outputBuf[0], 73, context);
   checkTest(qN.outputBuf[0], 73, contextN);
+  checkTest(q.outputBuf[1], 45, context);
   checkTest(qN.outputBuf[1], 45, contextN);
+  checkTest(q.outputBuf[19], 10, context);
   checkTest(qN.outputBuf[19], 10, contextN);
+  checkTest(q.outputBuf[210], -150, context);
   checkTest(qN.outputBuf[210], -150, contextN);
+  checkTest(q.outputBuf[5 * 20 * 20 + 210], 144, context);
   checkTest(qN.outputBuf[5 * 20 * 20 + 210], 144, contextN);
 
   constInit(weights, SpatialIn * SpatialOut * 3 * 3, static_cast<int16_t>(1));
@@ -69,7 +74,9 @@ void testQConv()
   q.propagate(input);
   qN.initWeights(weights);
   qN.propagate(input);
+  checkTest(q.outputBuf[0], 73, context);
   checkTest(qN.outputBuf[0], 73, contextN);
+  checkTest(q.outputBuf[5 * 20 * 20 + 210], 144, context);
   checkTest(qN.outputBuf[5 * 20 * 20 + 210], 144, contextN);
 
   constInit(weights, SpatialIn * SpatialOut * 3 * 3, static_cast<int16_t>(1));
@@ -78,8 +85,11 @@ void testQConv()
   q.propagate(input);
   qN.initWeights(weights);
   qN.propagate(input);
+  checkTest(q.outputBuf[0], 64, context);
   checkTest(qN.outputBuf[0], 64, contextN);
+  checkTest(q.outputBuf[5 * 20 * 20 + 19], 10, context);
   checkTest(qN.outputBuf[5 * 20 * 20 + 19], 10, contextN);
+  checkTest(q.outputBuf[5 * 20 * 20 + 210], -150, context);
   checkTest(qN.outputBuf[5 * 20 * 20 + 210], -150, contextN);
 
   constInit(weights, SpatialIn * SpatialOut * 3 * 3, static_cast<int16_t>(1));
@@ -96,8 +106,11 @@ void testQConv()
   q.propagate(input);
   qN.initWeights(weights);
   qN.propagate(input);
+  checkTest(q.outputBuf[0], -132, context);
   checkTest(qN.outputBuf[0], -132, contextN);
+  checkTest(q.outputBuf[250], 132, context);
   checkTest(qN.outputBuf[250], 132, contextN);
+  checkTest(q.outputBuf[20 * 20 * 10 + 250], 132, context);
   checkTest(qN.outputBuf[20 * 20 * 10 + 250], 132, contextN);
 }
 
