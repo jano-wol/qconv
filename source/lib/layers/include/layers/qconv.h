@@ -4,6 +4,7 @@
 #include <fstream>
 
 #include <core/simdops.h>
+#include <core/utils.h>
 #include <layers/common.h>
 #include <layers/tile.h>
 
@@ -76,8 +77,8 @@ public:
         env[i] =
             simde_mm256_setr_epi32(0, 0, 0, 0, input[i + 1], 0, input[i + SpatialSize], input[i + SpatialSize + 1]);
       } else if (i == SpatialSize - 1) {
-        env[i] = simde_mm256_setr_epi32(0, 0, 0, input[i - 1], 0, input[i + SpatialSize - 1], input[i + SpatialSize],
-                                        input[i + SpatialSize + 1]);
+        env[i] =
+            simde_mm256_setr_epi32(0, 0, 0, input[i - 1], 0, input[i + SpatialSize - 1], input[i + SpatialSize], 0);
       } else if (i == SpatialSize * (SpatialSize - 1)) {
         env[i] =
             simde_mm256_setr_epi32(0, input[i - SpatialSize], input[i - SpatialSize + 1], 0, input[i + 1], 0, 0, 0);
@@ -111,11 +112,25 @@ public:
     for (int i = 0; i < SpatialIn; ++i) {
       initEnv(input + i * SpatialSize * SpatialSize);
       for (int j = 0; j < SpatialOut; ++j) {
-        auto w = weightsEnv[i * SpatialOut + j];
+        auto w = weightsEnv[j * SpatialIn + i];
         for (int k = 0; k < SpatialSize * SpatialSize; ++k) {
           auto x = simde_mm256_mullo_epi32(env[k], w);
           auto y = hsum_8x32(x);
           outputBuf[j * SpatialSize * SpatialSize + k] += y;
+        }
+
+        typedef simdops::detail::VecOp<int32_t, Inst> Op;
+        typedef simdops::detail::VecLoadStore<int32_t, Alignment, Inst> LS;
+        auto C = Op::set1(static_cast<OutputType>(weightsC[j * SpatialIn + i]));
+        for (int b = 0; b < SpatialSize * SpatialSize / 8; ++b) {
+          auto data =
+              simde_mm256_setr_epi32(input[i * 400 + b * 8], input[i * 400 + b * 8 + 1], input[i * 400 + b * 8 + 2],
+                                     input[i * 400 + b * 8 + 3], input[i * 400 + b * 8 + 4], input[i * 400 + b * 8 + 5],
+                                     input[i * 400 + b * 8 + 6], input[i * 400 + b * 8 + 7]);
+          data = simde_mm256_mullo_epi32(data, C);
+          auto data2 = LS::load(outputBuf + j * SpatialSize * SpatialSize + b * 8);
+          data = Op::add(data, data2);
+          LS::store(outputBuf + j * SpatialSize * SpatialSize + b * 8, data);
         }
       }
     }

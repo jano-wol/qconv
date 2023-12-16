@@ -34,13 +34,21 @@ void testQConv()
   qN.propagate(input);
   checkTest(q.outputBuf[0], 64, context);
   checkTest(qN.outputBuf[0], 64, contextN);
+  checkTest(q.outputBuf[20 * 20 + 1], 96, context);
   checkTest(qN.outputBuf[20 * 20 + 1], 96, contextN);
+  checkTest(q.outputBuf[2 * 20 * 20 + 19], 64, context);
   checkTest(qN.outputBuf[2 * 20 * 20 + 19], 64, contextN);
+  checkTest(q.outputBuf[2 * 20 * 20 + 20], 96, context);
   checkTest(qN.outputBuf[2 * 20 * 20 + 20], 96, contextN);
+  checkTest(q.outputBuf[3 * 20 * 20 + 21], 144, context);
   checkTest(qN.outputBuf[3 * 20 * 20 + 21], 144, contextN);
+  checkTest(q.outputBuf[5 * 20 * 20 + 210], 144, context);
   checkTest(qN.outputBuf[5 * 20 * 20 + 210], 144, contextN);
+  checkTest(q.outputBuf[6 * 20 * 20 + 19 * 20], 64, context);
   checkTest(qN.outputBuf[6 * 20 * 20 + 19 * 20], 64, contextN);
+  checkTest(q.outputBuf[8 * 20 * 20 + 19 * 20 + 1], 96, context);
   checkTest(qN.outputBuf[8 * 20 * 20 + 19 * 20 + 1], 96, contextN);
+  checkTest(q.outputBuf[15 * 20 * 20 + 20 * 20 - 1], 64, context);
   checkTest(qN.outputBuf[15 * 20 * 20 + 20 * 20 - 1], 64, contextN);
 
   int16_t weightsNew[9] = {-90, -80, -70, -60, 5, 1, 2, 3, 4};
