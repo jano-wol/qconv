@@ -115,18 +115,19 @@ public:
           outputBuf[j * SpatialSize * SpatialSize + k] += y;
         }
 
+        typedef simdops::detail::VecBatch<SpatialSize * SpatialSize, int32_t, Inst> B;
         typedef simdops::detail::VecOp<int32_t, Inst> Op;
         typedef simdops::detail::VecLoadStore<int32_t, Alignment, Inst> LS;
         auto C = Op::set1(static_cast<int32_t>(weightsC[j * SpatialIn + i]));
-        for (int b = 0; b < SpatialSize * SpatialSize / 8; ++b) {
-          auto data =
-              simde_mm256_setr_epi32(input[i * 400 + b * 8], input[i * 400 + b * 8 + 1], input[i * 400 + b * 8 + 2],
-                                     input[i * 400 + b * 8 + 3], input[i * 400 + b * 8 + 4], input[i * 400 + b * 8 + 5],
-                                     input[i * 400 + b * 8 + 6], input[i * 400 + b * 8 + 7]);
+        for (int b = 0; b < B::NumBatch; ++b) {
+          int inIdx = i * SpatialSize * SpatialSize + b * B::RegWidth;
+          int outIdx = j * SpatialSize * SpatialSize + b * B::RegWidth;
+          auto data = simde_mm256_setr_epi32(input[inIdx], input[inIdx + 1], input[inIdx + 2], input[inIdx + 3], input[inIdx + 4],
+                                             input[inIdx + 5], input[inIdx + 6], input[inIdx + 7]);
           data = simde_mm256_mullo_epi32(data, C);
-          auto outputPart = LS::load(outputBuf + j * SpatialSize * SpatialSize + b * 8);
+          auto outputPart = LS::load(outputBuf + outIdx);
           outputPart = Op::add(data, outputPart);
-          LS::store(outputBuf + j * SpatialSize * SpatialSize + b * 8, outputPart);
+          LS::store(outputBuf + outIdx, outputPart);
         }
       }
     }
