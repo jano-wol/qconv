@@ -114,8 +114,52 @@ void testQConv()
   checkTest(qN.outputBuf[20 * 20 * 10 + 250], 132, contextN);
 }
 
+int getR()
+{
+  static int i = 1;
+  int p = 10000019;
+
+  long long q = (i % p) * (i % p);
+  long long ret = q % p;
+  ++i;
+  return static_cast<int>(ret);
+}
+
+void compareQConv()
+{
+  constexpr int SpatialIn = 16;
+  constexpr int SpatialOut = 16;
+  alignas(NativeAlignment) int8_t input[SpatialIn * 20 * 20];
+  alignas(NativeAlignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
+  QConv<SpatialIn, SpatialOut, 20, 3> q;
+  QConvNaive<SpatialIn, SpatialOut, 20, 3> qN;
+
+  for (int i = 0; i < SpatialIn * 20 * 20; ++i) {
+    int r = getR();
+    r = (r % 256) - 128;
+    input[i] = r;
+  }
+  for (int i = 0; i < SpatialIn * SpatialOut * 3 * 3; ++i) {
+    int r = getR();
+    r = (r % 16384) - 8192;
+    weights[i] = r;
+  }
+  q.initWeights(weights);
+  q.propagate(input);
+  qN.initWeights(weights);
+  qN.propagate(input);
+  for (int i = 0; i < SpatialOut * 20 * 20; ++i) {
+    if (q.outputBuf[i] != qN.outputBuf[i]) {
+      std::cerr << "Qconv and QconvNaive results are not aligned. Test failed. i=" << i << " qconvOut=" << q.outputBuf[i]
+                << " qconvNaiveOut=" << qN.outputBuf[i] << "\n";
+      exit(1);
+    }
+  }
+}
+
 int main()
 {
   testQConv();
+  compareQConv();
   return 0;
 }
