@@ -1,2 +1,2 @@
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../ext/googletest ext/googletest) #TODO
+include(GoogleTest)
 add_subdirectory(lib)

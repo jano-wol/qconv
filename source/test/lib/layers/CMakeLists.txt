@@ -15,6 +15,5 @@ target_link_libraries(${target}
 	GTest::gtest_main
 )
 
-include(GoogleTest) #TODO
 gtest_discover_tests(${target})
 
