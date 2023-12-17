@@ -1,3 +1,6 @@
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/ext/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/ext/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/ext/lib)
 add_subdirectory(benchmark)
 add_subdirectory(googletest)
 add_subdirectory(simde)
