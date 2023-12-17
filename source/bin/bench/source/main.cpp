@@ -5,6 +5,26 @@
 #include <layers/qconv.h>
 #include <layers/qconv_naive.h>
 
+#define GENERATE_STANDARD_BENCH_SUITES(name)         \
+  BENCHMARK_TEMPLATE(naive_##name, int8_t, 64);      \
+  BENCHMARK_TEMPLATE(simdops_##name, int8_t, 64);    \
+  BENCHMARK_TEMPLATE(naive_##name, int8_t, 512);     \
+  BENCHMARK_TEMPLATE(simdops_##name, int8_t, 512);   \
+  BENCHMARK_TEMPLATE(naive_##name, int8_t, 4096);    \
+  BENCHMARK_TEMPLATE(simdops_##name, int8_t, 4096);  \
+  BENCHMARK_TEMPLATE(naive_##name, int16_t, 64);     \
+  BENCHMARK_TEMPLATE(simdops_##name, int16_t, 64);   \
+  BENCHMARK_TEMPLATE(naive_##name, int16_t, 512);    \
+  BENCHMARK_TEMPLATE(simdops_##name, int16_t, 512);  \
+  BENCHMARK_TEMPLATE(naive_##name, int16_t, 4096);   \
+  BENCHMARK_TEMPLATE(simdops_##name, int16_t, 4096); \
+  BENCHMARK_TEMPLATE(naive_##name, int32_t, 64);     \
+  BENCHMARK_TEMPLATE(simdops_##name, int32_t, 64);   \
+  BENCHMARK_TEMPLATE(naive_##name, int32_t, 512);    \
+  BENCHMARK_TEMPLATE(simdops_##name, int32_t, 512);  \
+  BENCHMARK_TEMPLATE(naive_##name, int32_t, 4096);   \
+  BENCHMARK_TEMPLATE(simdops_##name, int32_t, 4096);
+
 using namespace qconv;
 using namespace qconv::core;
 using namespace qconv::layers;
@@ -19,40 +39,51 @@ void checkTrue(bool check)
 }
 
 // zero
-static void naive_zero_512_int8_t(benchmark::State& state)
+template <typename T, int Size>
+void naive_zero(benchmark::State& state)
 {
-  int8_t a[512];
-  modInit(a, 512, 11);
+  T a[Size];
+  modInit(a, Size, 11);
   for (auto _ : state) {
-    for (int i = 0; i < 512; ++i) {
+    for (int i = 0; i < Size; ++i) {
       a[i] = 0;
     }
   }
   checkTrue(a[1] == 0);
 }
-BENCHMARK(naive_zero_512_int8_t);
 
-static void simdops_zero_512_int8_t(benchmark::State& state)
+template <typename T, int Size>
+void simdops_zero(benchmark::State& state)
 {
-  alignas(simdops::NativeAlignment) int8_t a[512];
-  modInit(a, 512, 11);
+  alignas(simdops::NativeAlignment) T a[Size];
+  modInit(a, Size, 11);
   for (auto _ : state) {
-    simdops::zero<512, int8_t>(a);
+    simdops::zero<Size, T>(a);
   }
   checkTrue(a[1] == 0);
 }
-BENCHMARK(simdops_zero_512_int8_t);
+GENERATE_STANDARD_BENCH_SUITES(zero);
 
-static void memset_zero_512_int8_t(benchmark::State& state)
+template <typename T, int Size>
+static void memset_zero(benchmark::State& state)
 {
-  int8_t a[512];
-  modInit(a, 512, 11);
+  T a[Size];
+  modInit(a, Size, 11);
   for (auto _ : state) {
-    std::memset(a, 0, sizeof(int8_t) * 512);
+    std::memset(a, 0, sizeof(T) * Size);
   }
   checkTrue(a[1] == 0);
 }
-BENCHMARK(memset_zero_512_int8_t);
+
+BENCHMARK_TEMPLATE(memset_zero, int8_t, 64);
+BENCHMARK_TEMPLATE(memset_zero, int8_t, 512);
+BENCHMARK_TEMPLATE(memset_zero, int8_t, 4096);
+BENCHMARK_TEMPLATE(memset_zero, int16_t, 64);
+BENCHMARK_TEMPLATE(memset_zero, int16_t, 512);
+BENCHMARK_TEMPLATE(memset_zero, int16_t, 4096);
+BENCHMARK_TEMPLATE(memset_zero, int32_t, 64);
+BENCHMARK_TEMPLATE(memset_zero, int32_t, 512);
+BENCHMARK_TEMPLATE(memset_zero, int32_t, 4096);
 
 // copy
 static void naive_copy_512_int8_t(benchmark::State& state)
@@ -444,7 +475,7 @@ static void simdops_linear_512_float(benchmark::State& state)
 }
 BENCHMARK(simdops_linear_512_float);
 
-//#ifdef USE_AVX2
+// #ifdef USE_AVX2
 static void simdops_qconv(benchmark::State& state)
 {
   constexpr int SpatialIn = 16;
@@ -480,6 +511,6 @@ static void simdops_qconv_naive(benchmark::State& state)
   checkTrue(q.outputBuf[0] != 1);
 }
 BENCHMARK(simdops_qconv_naive);
-//#endif
+// #endif
 
 BENCHMARK_MAIN();
