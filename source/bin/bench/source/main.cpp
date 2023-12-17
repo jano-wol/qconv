@@ -5,54 +5,65 @@
 #include <layers/qconv.h>
 #include <layers/qconv_naive.h>
 
-#define BENCH_SUITES_FOR_2(name)                     \
-  BENCHMARK_TEMPLATE(naive_##name, int8_t, 64);      \
-  BENCHMARK_TEMPLATE(simdops_##name, int8_t, 64);    \
-  BENCHMARK_TEMPLATE(naive_##name, int8_t, 512);     \
-  BENCHMARK_TEMPLATE(simdops_##name, int8_t, 512);   \
-  BENCHMARK_TEMPLATE(naive_##name, int8_t, 4096);    \
-  BENCHMARK_TEMPLATE(simdops_##name, int8_t, 4096);  \
-  BENCHMARK_TEMPLATE(naive_##name, int16_t, 64);     \
-  BENCHMARK_TEMPLATE(simdops_##name, int16_t, 64);   \
-  BENCHMARK_TEMPLATE(naive_##name, int16_t, 512);    \
-  BENCHMARK_TEMPLATE(simdops_##name, int16_t, 512);  \
-  BENCHMARK_TEMPLATE(naive_##name, int16_t, 4096);   \
-  BENCHMARK_TEMPLATE(simdops_##name, int16_t, 4096); \
-  BENCHMARK_TEMPLATE(naive_##name, int32_t, 64);     \
-  BENCHMARK_TEMPLATE(simdops_##name, int32_t, 64);   \
-  BENCHMARK_TEMPLATE(naive_##name, int32_t, 512);    \
-  BENCHMARK_TEMPLATE(simdops_##name, int32_t, 512);  \
-  BENCHMARK_TEMPLATE(naive_##name, int32_t, 4096);   \
-  BENCHMARK_TEMPLATE(simdops_##name, int32_t, 4096);
+#define BENCH_SUITES_FOR_1(func1)           \
+  BENCHMARK_TEMPLATE(func1, int8_t, 64);    \
+  BENCHMARK_TEMPLATE(func1, int8_t, 512);   \
+  BENCHMARK_TEMPLATE(func1, int8_t, 4096);  \
+  BENCHMARK_TEMPLATE(func1, int16_t, 64);   \
+  BENCHMARK_TEMPLATE(func1, int16_t, 512);  \
+  BENCHMARK_TEMPLATE(func1, int16_t, 4096); \
+  BENCHMARK_TEMPLATE(func1, int32_t, 64);   \
+  BENCHMARK_TEMPLATE(func1, int32_t, 512);  \
+  BENCHMARK_TEMPLATE(func1, int32_t, 4096);
 
-#define BENCH_SUITES_FOR_3(name, func_3)             \
-  BENCHMARK_TEMPLATE(naive_##name, int8_t, 64);      \
-  BENCHMARK_TEMPLATE(simdops_##name, int8_t, 64);    \
-  BENCHMARK_TEMPLATE(func_3, int8_t, 64);            \
-  BENCHMARK_TEMPLATE(naive_##name, int8_t, 512);     \
-  BENCHMARK_TEMPLATE(simdops_##name, int8_t, 512);   \
-  BENCHMARK_TEMPLATE(func_3, int8_t, 512);           \
-  BENCHMARK_TEMPLATE(naive_##name, int8_t, 4096);    \
-  BENCHMARK_TEMPLATE(simdops_##name, int8_t, 4096);  \
-  BENCHMARK_TEMPLATE(func_3, int8_t, 4096);          \
-  BENCHMARK_TEMPLATE(naive_##name, int16_t, 64);     \
-  BENCHMARK_TEMPLATE(simdops_##name, int16_t, 64);   \
-  BENCHMARK_TEMPLATE(func_3, int16_t, 64);           \
-  BENCHMARK_TEMPLATE(naive_##name, int16_t, 512);    \
-  BENCHMARK_TEMPLATE(simdops_##name, int16_t, 512);  \
-  BENCHMARK_TEMPLATE(func_3, int16_t, 512);          \
-  BENCHMARK_TEMPLATE(naive_##name, int16_t, 4096);   \
-  BENCHMARK_TEMPLATE(simdops_##name, int16_t, 4096); \
-  BENCHMARK_TEMPLATE(func_3, int16_t, 4096);         \
-  BENCHMARK_TEMPLATE(naive_##name, int32_t, 64);     \
-  BENCHMARK_TEMPLATE(simdops_##name, int32_t, 64);   \
-  BENCHMARK_TEMPLATE(func_3, int32_t, 64);           \
-  BENCHMARK_TEMPLATE(naive_##name, int32_t, 512);    \
-  BENCHMARK_TEMPLATE(simdops_##name, int32_t, 512);  \
-  BENCHMARK_TEMPLATE(func_3, int32_t, 512);          \
-  BENCHMARK_TEMPLATE(naive_##name, int32_t, 4096);   \
-  BENCHMARK_TEMPLATE(simdops_##name, int32_t, 4096); \
-  BENCHMARK_TEMPLATE(func_3, int32_t, 4096);
+#define BENCH_SUITES_FOR_2(func1, func2)    \
+  BENCHMARK_TEMPLATE(func1, int8_t, 64);    \
+  BENCHMARK_TEMPLATE(func2, int8_t, 64);    \
+  BENCHMARK_TEMPLATE(func1, int8_t, 512);   \
+  BENCHMARK_TEMPLATE(func2, int8_t, 512);   \
+  BENCHMARK_TEMPLATE(func1, int8_t, 4096);  \
+  BENCHMARK_TEMPLATE(func2, int8_t, 4096);  \
+  BENCHMARK_TEMPLATE(func1, int16_t, 64);   \
+  BENCHMARK_TEMPLATE(func2, int16_t, 64);   \
+  BENCHMARK_TEMPLATE(func1, int16_t, 512);  \
+  BENCHMARK_TEMPLATE(func2, int16_t, 512);  \
+  BENCHMARK_TEMPLATE(func1, int16_t, 4096); \
+  BENCHMARK_TEMPLATE(func2, int16_t, 4096); \
+  BENCHMARK_TEMPLATE(func1, int32_t, 64);   \
+  BENCHMARK_TEMPLATE(func2, int32_t, 64);   \
+  BENCHMARK_TEMPLATE(func1, int32_t, 512);  \
+  BENCHMARK_TEMPLATE(func2, int32_t, 512);  \
+  BENCHMARK_TEMPLATE(func1, int32_t, 4096); \
+  BENCHMARK_TEMPLATE(func2, int32_t, 4096);
+
+#define BENCH_SUITES_FOR_3(func1, func2, func3) \
+  BENCHMARK_TEMPLATE(func1, int8_t, 64);        \
+  BENCHMARK_TEMPLATE(func2, int8_t, 64);        \
+  BENCHMARK_TEMPLATE(func3, int8_t, 64);        \
+  BENCHMARK_TEMPLATE(func1, int8_t, 512);       \
+  BENCHMARK_TEMPLATE(func2, int8_t, 512);       \
+  BENCHMARK_TEMPLATE(func3, int8_t, 512);       \
+  BENCHMARK_TEMPLATE(func1, int8_t, 4096);      \
+  BENCHMARK_TEMPLATE(func2, int8_t, 4096);      \
+  BENCHMARK_TEMPLATE(func3, int8_t, 4096);      \
+  BENCHMARK_TEMPLATE(func1, int16_t, 64);       \
+  BENCHMARK_TEMPLATE(func2, int16_t, 64);       \
+  BENCHMARK_TEMPLATE(func3, int16_t, 64);       \
+  BENCHMARK_TEMPLATE(func1, int16_t, 512);      \
+  BENCHMARK_TEMPLATE(func2, int16_t, 512);      \
+  BENCHMARK_TEMPLATE(func3, int16_t, 512);      \
+  BENCHMARK_TEMPLATE(func1, int16_t, 4096);     \
+  BENCHMARK_TEMPLATE(func2, int16_t, 4096);     \
+  BENCHMARK_TEMPLATE(func3, int16_t, 4096);     \
+  BENCHMARK_TEMPLATE(func1, int32_t, 64);       \
+  BENCHMARK_TEMPLATE(func2, int32_t, 64);       \
+  BENCHMARK_TEMPLATE(func3, int32_t, 64);       \
+  BENCHMARK_TEMPLATE(func1, int32_t, 512);      \
+  BENCHMARK_TEMPLATE(func2, int32_t, 512);      \
+  BENCHMARK_TEMPLATE(func3, int32_t, 512);      \
+  BENCHMARK_TEMPLATE(func1, int32_t, 4096);     \
+  BENCHMARK_TEMPLATE(func2, int32_t, 4096);     \
+  BENCHMARK_TEMPLATE(func3, int32_t, 4096);
 
 using namespace qconv;
 using namespace qconv::core;
@@ -103,7 +114,7 @@ static void memset_zero(benchmark::State& state)
   checkTrue(a[1] == 0);
 }
 
-BENCH_SUITES_FOR_3(zero, memset_zero);
+BENCH_SUITES_FOR_3(naive_zero, simdops_zero, memset_zero);
 
 // copy
 template <typename T, int Size>
@@ -146,34 +157,36 @@ void memcopy_copy(benchmark::State& state)
   checkTrue(b[1] == 1);
 }
 
-BENCH_SUITES_FOR_3(copy, memcopy_copy);
+BENCH_SUITES_FOR_3(naive_copy, simdops_copy, memcopy_copy);
 
 // dilate
-static void naive_dilate_512_int8_t(benchmark::State& state)
+template <typename T, int Size>
+void naive_dilate(benchmark::State& state)
 {
-  int8_t a[512];
-  int8_t b[512];
-  modInit(a, 512, 11);
+  T a[Size];
+  T b[Size];
+  modInit(a, Size, 11);
   for (auto _ : state) {
-    for (int i = 0; i < 512; ++i) {
+    for (int i = 0; i < Size; ++i) {
       b[i] = a[i] + 1;
     }
   }
   checkTrue(b[1] == 2);
 }
-BENCHMARK(naive_dilate_512_int8_t);
 
-static void simdops_dilate_512_int8_t(benchmark::State& state)
+template <typename T, int Size>
+void simdops_dilate(benchmark::State& state)
 {
-  alignas(simdops::NativeAlignment) int8_t a[512];
-  alignas(simdops::NativeAlignment) int8_t b[512];
-  modInit(a, 512, 11);
+  alignas(simdops::NativeAlignment) T a[Size];
+  alignas(simdops::NativeAlignment) T b[Size];
+  modInit(a, Size, 11);
   for (auto _ : state) {
-    simdops::add<512, int8_t>(b, a, 1);
+    simdops::add<Size, T>(b, a, 1);
   }
   checkTrue(b[1] == 2);
 }
-BENCHMARK(simdops_dilate_512_int8_t);
+
+BENCH_SUITES_FOR_2(naive_dilate, simdops_dilate);
 
 // add
 static void naive_add_512_int8_t(benchmark::State& state)
