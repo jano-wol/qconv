@@ -1,13 +1,14 @@
 #include <gmock/gmock.h>
 
-#include <core/utils.h>
 #include <layers/qconv.h>
 #include <layers/qconv_naive.h>
+#include <testutils/testutils.h>
 
 using namespace qconv;
 using namespace qconv::core;
 using namespace qconv::layers;
 using namespace qconv::simdops;
+using namespace qconv::testutils;
 
 int getR()
 {

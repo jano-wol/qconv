@@ -10,6 +10,7 @@ target_link_libraries(${target}
 	PUBLIC
 	core
 	layers
+	testutils
 	PRIVATE
 	gmock-dev
 	GTest::gtest_main

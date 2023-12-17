@@ -4,7 +4,6 @@
 #include <fstream>
 
 #include <core/simdops.h>
-#include <core/utils.h>
 #include <layers/common.h>
 #include <layers/tile.h>
 

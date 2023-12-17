@@ -1,10 +1,10 @@
-#include <core/utils.h>
+#include <testutils/testutils.h>
 
 #include <iostream>
 
 using namespace qconv;
 
-void core::printAs32s(simde__m256i v)
+void testutils::printAs32s(simde__m256i v)
 {
   int32_t values[8];
   simde_mm256_storeu_si256(values, v);
@@ -14,7 +14,7 @@ void core::printAs32s(simde__m256i v)
   std::cout << "\n";
 }
 
-void core::printAs16s(simde__m256i v)
+void testutils::printAs16s(simde__m256i v)
 {
   int16_t values[16];
   simde_mm256_storeu_si256(values, v);
@@ -24,7 +24,7 @@ void core::printAs16s(simde__m256i v)
   std::cout << "\n";
 }
 
-void core::printAs8s(simde__m256i v)
+void testutils::printAs8s(simde__m256i v)
 {
   int8_t values[32];
   simde_mm256_storeu_si256(values, v);

@@ -1,0 +1,10 @@
+add_subdirectory(add)
+add_subdirectory(copy)
+add_subdirectory(dilate)
+add_subdirectory(linear)
+add_subdirectory(min_max)
+add_subdirectory(min_max_global)
+add_subdirectory(qconv)
+add_subdirectory(relu)
+add_subdirectory(zero)
+
