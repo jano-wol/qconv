@@ -113,7 +113,6 @@ static void memset_zero(benchmark::State& state)
   }
   checkTrue(a[1] == 0);
 }
-
 BENCH_SUITES_FOR_3(naive_zero, simdops_zero, memset_zero);
 
 // copy
@@ -156,7 +155,6 @@ void memcopy_copy(benchmark::State& state)
   }
   checkTrue(b[1] == 1);
 }
-
 BENCH_SUITES_FOR_3(naive_copy, simdops_copy, memcopy_copy);
 
 // dilate
@@ -185,50 +183,51 @@ void simdops_dilate(benchmark::State& state)
   }
   checkTrue(b[1] == 2);
 }
-
 BENCH_SUITES_FOR_2(naive_dilate, simdops_dilate);
 
 // add
-static void naive_add_512_int8_t(benchmark::State& state)
+template <typename T, int Size>
+void naive_add(benchmark::State& state)
 {
-  int8_t a[512];
-  int8_t b[512];
-  int8_t c[512];
-  modInit(a, 512, 11);
-  modInit(b, 512, 11);
+  T a[Size];
+  T b[Size];
+  T c[Size];
+  modInit(a, Size, 11);
+  modInit(b, Size, 11);
   for (auto _ : state) {
-    for (int i = 0; i < 512; ++i) {
+    for (int i = 0; i < Size; ++i) {
       c[i] = a[i] + b[i];
     }
   }
   checkTrue(c[2] == 4);
 }
-BENCHMARK(naive_add_512_int8_t);
 
-static void simdops_add_512_int8_t(benchmark::State& state)
+template <typename T, int Size>
+void simdops_add(benchmark::State& state)
 {
-  alignas(simdops::NativeAlignment) int8_t a[512];
-  alignas(simdops::NativeAlignment) int8_t b[512];
-  alignas(simdops::NativeAlignment) int8_t c[512];
-  modInit(a, 512, 11);
-  modInit(b, 512, 11);
+  alignas(simdops::NativeAlignment) T a[Size];
+  alignas(simdops::NativeAlignment) T b[Size];
+  alignas(simdops::NativeAlignment) T c[Size];
+  modInit(a, Size, 11);
+  modInit(b, Size, 11);
   for (auto _ : state) {
-    simdops::add<512, int8_t>(c, a, b);
+    simdops::add<Size, T>(c, a, b);
   }
   checkTrue(c[2] == 4);
 }
-BENCHMARK(simdops_add_512_int8_t);
+BENCH_SUITES_FOR_2(naive_add, simdops_add);
 
 // min
-static void naive_min_512_int8_t(benchmark::State& state)
+template <typename T, int Size>
+void naive_min(benchmark::State& state)
 {
-  int8_t a[512];
-  int8_t b[512];
-  int8_t c[512];
-  constInit(a, 512, static_cast<int8_t>(4));
-  modInit(b, 512, 11);
+  T a[Size];
+  T b[Size];
+  T c[Size];
+  constInit(a, Size, static_cast<T>(4));
+  modInit(b, Size, 11);
   for (auto _ : state) {
-    for (int i = 0; i < 512; ++i) {
+    for (int i = 0; i < Size; ++i) {
       if (a[i] <= b[i]) {
         c[i] = a[i];
       } else {
@@ -238,32 +237,34 @@ static void naive_min_512_int8_t(benchmark::State& state)
   }
   checkTrue(c[5] == 4);
 }
-BENCHMARK(naive_min_512_int8_t);
 
-static void simdops_min_512_int8_t(benchmark::State& state)
+template <typename T, int Size>
+void simdops_min(benchmark::State& state)
 {
-  alignas(simdops::NativeAlignment) int8_t a[512];
-  alignas(simdops::NativeAlignment) int8_t b[512];
-  alignas(simdops::NativeAlignment) int8_t c[512];
-  constInit(a, 512, static_cast<int8_t>(4));
-  modInit(b, 512, 11);
+  alignas(simdops::NativeAlignment) T a[Size];
+  alignas(simdops::NativeAlignment) T b[Size];
+  alignas(simdops::NativeAlignment) T c[Size];
+  constInit(a, Size, static_cast<T>(4));
+  modInit(b, Size, 11);
   for (auto _ : state) {
-    simdops::min<512, int8_t>(c, a, b);
+    simdops::min<Size, T>(c, a, b);
   }
   checkTrue(c[5] == 4);
 }
-BENCHMARK(simdops_min_512_int8_t);
+BENCH_SUITES_FOR_2(naive_min, simdops_min);
 
 // minGlobal
-static void naive_min_global_512_int8_t(benchmark::State& state)
+template <typename T, int Size>
+void naive_min_global(benchmark::State& state)
 {
-  int8_t a[512];
-  modInit(a, 512, 8);
-  a[321] = -7;
-  int8_t ret = 0;
+  static_assert(std::is_signed<T>::value, "Test is implemented for signed types only!");
+  T a[Size];
+  modInit(a, Size, 8);
+  a[59] = -7;
+  T ret = 0;
   for (auto _ : state) {
-    int8_t currMin = 127;
-    for (int i = 0; i < 512; ++i) {
+    T currMin = 127;
+    for (int i = 0; i < Size; ++i) {
       if (a[i] <= currMin) {
         currMin = a[i];
       }
@@ -272,21 +273,28 @@ static void naive_min_global_512_int8_t(benchmark::State& state)
   }
   checkTrue(ret == -7);
 }
-BENCHMARK(naive_min_global_512_int8_t);
 
 #ifdef USE_AVX2
-static void simdops_min_global_512_int8_t(benchmark::State& state)
+template <typename T, int Size>
+void simdops_min_global(benchmark::State& state)
 {
-  alignas(simdops::NativeAlignment) int8_t a[512];
-  modInit(a, 512, 8);
-  a[321] = -7;
-  int8_t ret = 0;
+  static_assert(std::is_same<T, int8_t>::value, "Test is currently implemented only for int8_t!");
+  alignas(simdops::NativeAlignment) T a[Size];
+  modInit(a, Size, 8);
+  a[59] = -7;
+  T ret = 0;
   for (auto _ : state) {
-    ret = simdops::minGlobal<512>(a);
+    ret = simdops::minGlobal<Size>(a);
   }
+  std::cerr << "ret=" << int(ret) << "\n";
   checkTrue(ret == -7);
 }
-BENCHMARK(simdops_min_global_512_int8_t);
+BENCH_SUITES_FOR_1(naive_min_global);
+BENCHMARK_TEMPLATE(simdops_min_global, int8_t, 512);
+BENCHMARK_TEMPLATE(simdops_min_global, int8_t, 512);
+BENCHMARK_TEMPLATE(simdops_min_global, int8_t, 4096);
+#else
+BENCH_SUITES_FOR_1(naive_min_global);
 #endif
 
 // max
