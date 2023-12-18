@@ -5,7 +5,6 @@
 #include <testutils/testutils.h>
 
 using namespace qconv;
-using namespace qconv::core;
 using namespace qconv::layers;
 using namespace qconv::simdops;
 using namespace qconv::testutils;

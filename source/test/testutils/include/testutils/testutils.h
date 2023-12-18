@@ -3,7 +3,7 @@
 
 #include <random>
 
-#include <core/simdops.h>
+#include <simdops/simdops.h>
 
 namespace qconv::testutils
 {

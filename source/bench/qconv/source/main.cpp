@@ -1,9 +1,9 @@
 #include <cstring>
 
 #include <benchutils/benchutils.h>
-#include <core/simdops.h>
 #include <layers/qconv.h>
 #include <layers/qconv_naive.h>
+#include <simdops/simdops.h>
 #include <testutils/testutils.h>
 
 using namespace qconv;

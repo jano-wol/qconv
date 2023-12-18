@@ -7,8 +7,6 @@
 #include <optional>
 #include <sstream>
 
-#include <core/paths.h>
-
 #if defined(USE_AVX2)
 #include <immintrin.h>
 

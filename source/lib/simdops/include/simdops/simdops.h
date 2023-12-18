@@ -1,5 +1,5 @@
-#ifndef QCONV_CORE_SIMDOPS_H_
-#define QCONV_CORE_SIMDOPS_H_
+#ifndef QCONV_SIMDOPS_SIMDOPS_H_
+#define QCONV_SIMDOPS_SIMDOPS_H_
 
 #include <cassert>
 #include <tuple>
@@ -1320,4 +1320,4 @@ void assertInRange(simde__m256i x, int min, int max)
 }
 }  // namespace debug
 }  // namespace simdops
-#endif  // QCONV_CORE_SIMDOPS_H_
+#endif  // QCONV_SIMDOPS_SIMDOPS_H_

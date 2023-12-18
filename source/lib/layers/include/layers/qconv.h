@@ -3,9 +3,9 @@
 
 #include <fstream>
 
-#include <core/simdops.h>
 #include <layers/common.h>
 #include <layers/tile.h>
+#include <simdops/simdops.h>
 
 static inline int32_t hsum_epi32(simde__m128i x)
 {

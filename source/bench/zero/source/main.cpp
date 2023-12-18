@@ -1,7 +1,7 @@
 #include <cstring>
 
 #include <benchutils/benchutils.h>
-#include <core/simdops.h>
+#include <simdops/simdops.h>
 #include <testutils/testutils.h>
 
 using namespace qconv;

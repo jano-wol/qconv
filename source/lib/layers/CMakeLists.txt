@@ -10,6 +10,5 @@ set(headers ${include_path}/add.h
 set(sources ${source_path}/tile.cpp
             )			
 add_library(${target} ${headers} ${sources})
-set_target_properties(${target} PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(${target} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
-target_link_libraries(${target} core)
+target_link_libraries(${target} simdops)
