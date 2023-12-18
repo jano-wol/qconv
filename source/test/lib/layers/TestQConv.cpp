@@ -10,17 +10,6 @@ using namespace qconv::layers;
 using namespace qconv::simdops;
 using namespace qconv::testutils;
 
-int getR()
-{
-  static int i = 1;
-  int p = 10000019;
-
-  long long q = (i % p) * (i % p);
-  long long ret = q % p;
-  ++i;
-  return static_cast<int>(ret);
-}
-
 TEST(QConv, AllOne)
 {
   constexpr int SpatialIn = 16;
@@ -168,16 +157,32 @@ TEST(QConv, CompareWithNaive)
   alignas(NativeAlignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
   QConv<SpatialIn, SpatialOut, 20, 3> q;
   QConvNaive<SpatialIn, SpatialOut, 20, 3> qN;
-  for (int i = 0; i < SpatialIn * 20 * 20; ++i) {
-    int r = getR();
-    r = (r % 256) - 128;
-    input[i] = r;
+
+  // random alignment
+  randInit<int8_t>(input, SpatialIn * 20 * 20);
+  randInit<int16_t>(weights, SpatialIn * SpatialOut * 3 * 3);
+  q.initWeights(weights);
+  q.propagate(input);
+  qN.initWeights(weights);
+  qN.propagate(input);
+  for (int i = 0; i < SpatialOut * 20 * 20; ++i) {
+    EXPECT_EQ(q.outputBuf[i], qN.outputBuf[i]);
   }
-  for (int i = 0; i < SpatialIn * SpatialOut * 3 * 3; ++i) {
-    int r = getR();
-    r = (r % 16384) - 8192;
-    weights[i] = r;
+
+  // stress high
+  constInit<int8_t>(input, SpatialIn * 20 * 20, 127);
+  constInit<int16_t>(weights, SpatialIn * SpatialOut * 3 * 3, 32767);
+  q.initWeights(weights);
+  q.propagate(input);
+  qN.initWeights(weights);
+  qN.propagate(input);
+  for (int i = 0; i < SpatialOut * 20 * 20; ++i) {
+    EXPECT_EQ(q.outputBuf[i], qN.outputBuf[i]);
   }
+
+  // stress low
+  constInit<int8_t>(input, SpatialIn * 20 * 20, -128);
+  constInit<int16_t>(weights, SpatialIn * SpatialOut * 3 * 3, -32768);
   q.initWeights(weights);
   q.propagate(input);
   qN.initWeights(weights);

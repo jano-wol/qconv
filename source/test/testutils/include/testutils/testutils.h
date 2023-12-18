@@ -1,6 +1,8 @@
 #ifndef QCONV_TESTUTILS_TESTUTILS_H_
 #define QCONV_TESTUTILS_TESTUTILS_H_
 
+#include <random>
+
 #include <core/simdops.h>
 
 namespace qconv::testutils
@@ -18,6 +20,20 @@ void modInit(T* a, int s, int mod)
 {
   for (int i = 0; i < s; ++i) {
     a[i] = i % mod;
+  }
+}
+
+template <typename T>
+void randInit(T* a, int s)
+{
+  std::mt19937 e;
+  long long mod = (1 << (sizeof(T) * 8));
+  for (int i = 0; i < s; ++i) {
+    int r = e() % mod;
+    if (std::is_signed<T>::value) {
+      r -= (mod / 2);
+    }
+    a[i] = r;
   }
 }
 
