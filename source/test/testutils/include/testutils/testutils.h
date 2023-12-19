@@ -28,7 +28,7 @@ template <typename T>
 void randInit(T* a, int s)
 {
   std::mt19937 e;
-  long long mod = (1 << (sizeof(T) * 8));
+  unsigned long long mod = (1UL << (sizeof(T) * 8));
   for (int i = 0; i < s; ++i) {
     int r = e() % mod;
     if (std::is_signed<T>::value) {
