@@ -1,6 +1,7 @@
 #ifndef QCONV_TESTUTILS_TESTUTILS_H_
 #define QCONV_TESTUTILS_TESTUTILS_H_
 
+#include <iostream>
 #include <random>
 
 #include <simdops/simdops.h>
@@ -47,9 +48,29 @@ void weightInit_32_512(T a[32][512])
   }
 }
 
-void printAs32s(simde__m256i v);
-void printAs16s(simde__m256i v);
-void printAs8s(simde__m256i v);
+template <typename PrintType>
+void printLongRegister(simde__m128i v)
+{
+  constexpr size_t N = sizeof(simde__m128i) / sizeof(PrintType);
+  PrintType values[N];
+  simde_mm_storeu_si128(values, v);
+  for (int i = 0; i < N; ++i) {
+    std::cout << static_cast<int>(values[i]) << " ";
+  }
+  std::cout << "\n";
+}
+
+template <typename PrintType>
+void printLongRegister(simde__m256i v)
+{
+  constexpr size_t N = sizeof(simde__m256i) / sizeof(PrintType);
+  PrintType values[N];
+  simde_mm256_storeu_si256(values, v);
+  for (int i = 0; i < N; ++i) {
+    std::cout << static_cast<int>(values[i]) << " ";
+  }
+  std::cout << "\n";
+}
 }  // namespace qconv::testutils
 
 #endif  // QCONV_TESTUTILS_TESTUTILS_H_

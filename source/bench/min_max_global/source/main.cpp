@@ -39,7 +39,7 @@ void min_global_simdops(benchmark::State& state)
   for (auto _ : state) {
     ret = simdops::minGlobal<Size>(a);
   }
-  //checkTrue(ret == -7); TODO
+  checkTrue(ret == -7);
 }
 BENCH_SUITES_FOR_1(min_global_naive);
 BENCHMARK_TEMPLATE(min_global_simdops, int8_t, 64);
@@ -66,7 +66,7 @@ void max_global_naive(benchmark::State& state)
     }
     ret = currMax;
   }
-  // checkTrue(ret == -7);
+  checkTrue(ret == 71);
 }
 
 #ifdef USE_AVX2
@@ -81,7 +81,7 @@ void max_global_simdops(benchmark::State& state)
   for (auto _ : state) {
     ret = simdops::maxGlobal<Size>(a);
   }
-  // checkTrue(ret == 71); TODO
+  checkTrue(ret == 71);
 }
 BENCH_SUITES_FOR_1(max_global_naive);
 BENCHMARK_TEMPLATE(max_global_simdops, int8_t, 64);
