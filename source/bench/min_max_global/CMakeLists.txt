@@ -1,4 +1,4 @@
-set(target min_max_global-bench)
+set(target min_max_h-bench)
 set(sources ${CMAKE_CURRENT_SOURCE_DIR}/source/main.cpp
             )
 add_executable(${target} ${sources})

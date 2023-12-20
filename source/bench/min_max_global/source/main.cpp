@@ -8,7 +8,7 @@ using namespace qconv;
 using namespace qconv::testutils;
 
 template <int Size, typename T>
-T minGlobalNaive(T* input)
+T minHNaive(T* input)
 {
   T currMin = input[0];
   for (int i = 0; i < Size; ++i) {
@@ -20,7 +20,7 @@ T minGlobalNaive(T* input)
 }
 
 template <typename T, int Size>
-void min_global_naive(benchmark::State& state)
+void min_h_naive(benchmark::State& state)
 {
   static_assert(std::is_signed<T>::value, "Test is implemented for signed types only!");
   alignas(simdops::NativeAlignment) T a[Size];
@@ -28,7 +28,7 @@ void min_global_naive(benchmark::State& state)
   a[59] = -7;
   T ret = 0;
   for (auto _ : state) {
-    ret = minGlobalNaive<Size, T>(a);
+    ret = minHNaive<Size, T>(a);
     benchmark::DoNotOptimize(ret);
   }
   std::ostream cnull(nullptr);
@@ -37,7 +37,7 @@ void min_global_naive(benchmark::State& state)
 }
 
 template <typename T, int Size>
-void min_global_simdops(benchmark::State& state)
+void min_h_simdops(benchmark::State& state)
 {
   static_assert(std::is_signed<T>::value, "Test is implemented for signed types only!");
   alignas(simdops::NativeAlignment) T a[Size];
@@ -45,17 +45,17 @@ void min_global_simdops(benchmark::State& state)
   a[59] = -7;
   T ret = 0;
   for (auto _ : state) {
-    ret = simdops::minGlobal<Size, T>(a);
+    ret = simdops::minH<Size, T>(a);
     benchmark::DoNotOptimize(ret);
   }
   std::ostream cnull(nullptr);
   cnull << ret;
   checkTrue(ret == -7);
 }
-BENCH_SUITES_FOR_2(min_global_naive, min_global_simdops);
+BENCH_SUITES_FOR_2(min_h_naive, min_h_simdops);
 
 template <int Size, typename T>
-T maxGlobalNaive(T* input)
+T maxHNaive(T* input)
 {
   T currMax = input[0];
   for (int i = 0; i < Size; ++i) {
@@ -67,7 +67,7 @@ T maxGlobalNaive(T* input)
 }
 
 template <typename T, int Size>
-void max_global_naive(benchmark::State& state)
+void max_h_naive(benchmark::State& state)
 {
   static_assert(std::is_signed<T>::value, "Test is implemented for signed types only!");
   alignas(simdops::NativeAlignment) T a[Size];
@@ -75,7 +75,7 @@ void max_global_naive(benchmark::State& state)
   a[59] = 71;
   T ret = 0;
   for (auto _ : state) {
-    ret = simdops::maxGlobal<Size, T>(a);
+    ret = maxHNaive<Size, T>(a);
     benchmark::DoNotOptimize(ret);
   }
   std::ostream cnull(nullptr);
@@ -84,7 +84,7 @@ void max_global_naive(benchmark::State& state)
 }
 
 template <typename T, int Size>
-void max_global_simdops(benchmark::State& state)
+void max_h_simdops(benchmark::State& state)
 {
   static_assert(std::is_signed<T>::value, "Test is implemented for signed types only!");
   alignas(simdops::NativeAlignment) T a[Size];
@@ -92,13 +92,13 @@ void max_global_simdops(benchmark::State& state)
   a[59] = 71;
   T ret = 0;
   for (auto _ : state) {
-    ret = simdops::maxGlobal<Size, T>(a);
+    ret = simdops::maxH<Size, T>(a);
     benchmark::DoNotOptimize(ret);
   }
   std::ostream cnull(nullptr);
   cnull << ret;
   checkTrue(ret == 71);
 }
-BENCH_SUITES_FOR_2(max_global_naive, max_global_simdops);
+BENCH_SUITES_FOR_2(max_h_naive, max_h_simdops);
 
 BENCHMARK_MAIN();

@@ -971,9 +971,9 @@ T* min(T* output, const T* input0, const T* input1)
 }
 
 template <int Size, typename T, int Alignment = NativeAlignment, InstructionType Inst = NativeInstType>
-T minGlobal(T* input)
+T minH(T* input)
 {
-  // This naive implementation is compiled to efficient machine code, thanks to the -avx2 compiler flag. 
+  // This naive implementation is compiled to efficient machine code thanks to the -avx2 compiler flag.
   static_assert(isAlignSizeOK(Alignment));
   static_assert(Size > 0 && Size % 32 == 0, "Size must be divisble by 32");
   assert(isPtrAligned<Alignment>(input));
@@ -1011,9 +1011,9 @@ T* max(T* output, const T* input0, const T* input1)
 }
 
 template <int Size, typename T, int Alignment = NativeAlignment, InstructionType Inst = NativeInstType>
-T maxGlobal(T* input)
+T maxH(T* input)
 {
-  // This naive implementation is compiled to efficient machine code, thanks to the -avx2 compiler flag.
+  // This naive implementation is compiled to efficient machine code thanks to the -avx2 compiler flag.
   static_assert(isAlignSizeOK(Alignment));
   static_assert(Size > 0 && Size % 32 == 0, "Size must be divisble by 32");
   assert(isPtrAligned<Alignment>(input));

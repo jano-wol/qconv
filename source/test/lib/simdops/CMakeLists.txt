@@ -1,7 +1,7 @@
 ﻿set(target simdops-tests)
 
 set(sources
-	TestMinMaxGlobal.cpp
+	TestMinMaxH.cpp
 )
 
 add_executable(${target} ${sources})
