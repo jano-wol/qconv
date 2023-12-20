@@ -27,27 +27,20 @@ void min_global_naive(benchmark::State& state)
   checkTrue(ret == -7);
 }
 
-#ifdef USE_AVX2
 template <typename T, int Size>
 void min_global_simdops(benchmark::State& state)
 {
-  static_assert(std::is_same<T, int8_t>::value, "Test is implemented only for int8_t!");
+  static_assert(std::is_signed<T>::value, "Test is implemented for signed types only!");
   alignas(simdops::NativeAlignment) T a[Size];
-  modInit(a, Size, 8);
+  modInit(a, Size, 100);
   a[59] = -7;
   T ret = 0;
   for (auto _ : state) {
-    ret = simdops::minGlobal<Size>(a);
+    ret = simdops::minGlobal<Size, T>(a);
   }
   checkTrue(ret == -7);
 }
-BENCH_SUITES_FOR_1(min_global_naive);
-BENCHMARK_TEMPLATE(min_global_simdops, int8_t, 64);
-BENCHMARK_TEMPLATE(min_global_simdops, int8_t, 512);
-BENCHMARK_TEMPLATE(min_global_simdops, int8_t, 4096);
-#else
-BENCH_SUITES_FOR_1(min_global_naive);
-#endif
+BENCH_SUITES_FOR_2(min_global_naive, min_global_simdops);
 
 template <typename T, int Size>
 void max_global_naive(benchmark::State& state)
@@ -69,26 +62,19 @@ void max_global_naive(benchmark::State& state)
   checkTrue(ret == 71);
 }
 
-#ifdef USE_AVX2
 template <typename T, int Size>
 void max_global_simdops(benchmark::State& state)
 {
-  static_assert(std::is_same<T, int8_t>::value, "Test is implemented only for int8_t!");
+  static_assert(std::is_signed<T>::value, "Test is implemented for signed types only!");
   alignas(simdops::NativeAlignment) T a[Size];
   modInit(a, Size, 8);
   a[59] = 71;
   T ret = 0;
   for (auto _ : state) {
-    ret = simdops::maxGlobal<Size>(a);
+    ret = simdops::maxGlobal<Size, T>(a);
   }
   checkTrue(ret == 71);
 }
-BENCH_SUITES_FOR_1(max_global_naive);
-BENCHMARK_TEMPLATE(max_global_simdops, int8_t, 64);
-BENCHMARK_TEMPLATE(max_global_simdops, int8_t, 512);
-BENCHMARK_TEMPLATE(max_global_simdops, int8_t, 4096);
-#else
-BENCH_SUITES_FOR_1(max_global_naive);
-#endif
+BENCH_SUITES_FOR_2(max_global_naive, max_global_simdops);
 
 BENCHMARK_MAIN();

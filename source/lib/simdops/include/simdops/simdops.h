@@ -970,88 +970,20 @@ T* min(T* output, const T* input0, const T* input1)
   return output + B::NumBatch * B::RegWidth;
 }
 
-template <typename PrintType>
-void printLongRegister2(simde__m128i v)
+template <int Size, typename T, int Alignment = NativeAlignment, InstructionType Inst = NativeInstType>
+T minGlobal(T* input)
 {
-  constexpr size_t N = sizeof(simde__m128i) / sizeof(PrintType);
-  PrintType values[N];
-  simde_mm_storeu_si128(values, v);
-  for (int i = 0; i < N; ++i) {
-    std::cout << static_cast<int>(values[i]) << " ";
-  }
-  std::cout << "\n";
-}
-
-template <typename PrintType>
-void printLongRegister2(simde__m256i v)
-{
-  constexpr size_t N = sizeof(simde__m256i) / sizeof(PrintType);
-  PrintType values[N];
-  simde_mm256_storeu_si256(values, v);
-  for (int i = 0; i < N; ++i) {
-    std::cout << static_cast<int>(values[i]) << " ";
-  }
-  std::cout << "\n";
-}
-
-static inline int8_t hmin_epi8(simde__m128i x)
-{
-  /*   simde__m128i hi64 =
-        simde_mm_unpackhi_epi64(x, x);  // 3-operand non-destructive AVX lets us save a byte without needing a movdqa
-    simde__m128i min64 = simde_mm_min_epi32(hi64, x);
-    simde__m128i hi32 = simde_mm_shuffle_epi32(min64, _MM_SHUFFLE(2, 3, 0, 1));  // Swap the low two elements
-    simde__m128i min32 = simde_mm_min_epi32(min64, hi32);
-    return simde_mm_cvtsi128_si32(min32);  // movd */
-  x = simde_mm_min_epi8(x, simde_mm_alignr_epi8(x, x, 1));
-  x = simde_mm_min_epi8(x, simde_mm_alignr_epi8(x, x, 2));
-  x = simde_mm_min_epi8(x, simde_mm_alignr_epi8(x, x, 4));
-  x = simde_mm_min_epi8(x, simde_mm_alignr_epi8(x, x, 8));
-  return simde_mm_extract_epi8(x, 0);
-}
-
-static inline int8_t hmax_epi8(simde__m128i x)
-{
-  /*   simde__m128i hi64 =
-        simde_mm_unpackhi_epi64(x, x);  // 3-operand non-destructive AVX lets us save a byte without needing a movdqa
-    simde__m128i min64 = simde_mm_min_epi32(hi64, x);
-    simde__m128i hi32 = simde_mm_shuffle_epi32(min64, _MM_SHUFFLE(2, 3, 0, 1));  // Swap the low two elements
-    simde__m128i min32 = simde_mm_min_epi32(min64, hi32);
-    return simde_mm_cvtsi128_si32(min32);  // movd */
-  x = simde_mm_max_epu8(x, simde_mm_alignr_epi8(x, x, 1));
-  x = simde_mm_max_epu8(x, simde_mm_alignr_epi8(x, x, 2));
-  x = simde_mm_max_epu8(x, simde_mm_alignr_epi8(x, x, 4));
-  x = simde_mm_max_epu8(x, simde_mm_alignr_epi8(x, x, 8));
-  return simde_mm_extract_epi8(x, 0);
-}
-
-static inline int8_t hmin_32x8(simde__m256i v)
-{
-  simde__m128i min128 = simde_mm_min_epi8(simde_mm256_castsi256_si128(v), simde_mm256_extracti128_si256(v, 1));
-  return hmin_epi8(min128);
-}
-
-static inline int8_t hmax_32x8(simde__m256i v)
-{
-  simde__m128i max128 = simde_mm_max_epi8(simde_mm256_castsi256_si128(v), simde_mm256_extracti128_si256(v, 1));
-  return hmax_epi8(max128);
-}
-
-template <int Size, int Alignment = NativeAlignment, InstructionType Inst = NativeInstType>
-int8_t minGlobal(int8_t* input)
-{
-  static_assert(Inst == AVX2, "Only avx2 is supported now!");
   static_assert(isAlignSizeOK(Alignment));
+  static_assert(Size > 0 && Size % 32 == 0, "Size must be divisble by 32");
   assert(isPtrAligned<Alignment>(input));
 
-  static_assert(Size % 32 == 0, "Size must be divisble by 32");
-
-  simde__m256i minValues = simde_mm256_loadu_si256((simde__m256i*)input);
-
-  for (size_t i = 32; i < Size; i += 32) {
-    const simde__m256i values = simde_mm256_loadu_si256((simde__m256i*)(input + i));
-    minValues = simde_mm256_min_epi8(values, minValues);
+  T currMin = input[0];
+  for (int i = 0; i < Size; ++i) {
+    if (input[i] < currMin) {
+      currMin = input[i];
+    }
   }
-  return hmin_32x8(minValues);
+  return currMin;
 }
 
 template <int Size, typename T, int Alignment = NativeAlignment, InstructionType Inst = NativeInstType>
@@ -1077,22 +1009,20 @@ T* max(T* output, const T* input0, const T* input1)
   return output + B::NumBatch * B::RegWidth;
 }
 
-template <int Size, int Alignment = NativeAlignment, InstructionType Inst = NativeInstType>
-int8_t maxGlobal(int8_t* input)
+template <int Size, typename T, int Alignment = NativeAlignment, InstructionType Inst = NativeInstType>
+T maxGlobal(T* input)
 {
-  static_assert(Inst == AVX2, "Only avx2 is supported now!");
   static_assert(isAlignSizeOK(Alignment));
+  static_assert(Size > 0 && Size % 32 == 0, "Size must be divisble by 32");
   assert(isPtrAligned<Alignment>(input));
 
-  static_assert(Size % 32 == 0, "Size must be divisble by 32");
-
-  simde__m256i maxValues = simde_mm256_loadu_si256((simde__m256i*)input);
-
-  for (size_t i = 32; i < Size; i += 32) {
-    const simde__m256i values = simde_mm256_loadu_si256((simde__m256i*)(input + i));
-    maxValues = simde_mm256_max_epi8(values, maxValues);
+  T currMax = input[0];
+  for (int i = 0; i < Size; ++i) {
+    if (input[i] > currMax) {
+      currMax = input[i];
+    }
   }
-  return hmax_32x8(maxValues);
+  return currMax;
 }
 
 template <int Size, typename T, int Alignment = NativeAlignment, InstructionType Inst = NativeInstType>
