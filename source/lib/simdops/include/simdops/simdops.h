@@ -973,6 +973,7 @@ T* min(T* output, const T* input0, const T* input1)
 template <int Size, typename T, int Alignment = NativeAlignment, InstructionType Inst = NativeInstType>
 T minGlobal(T* input)
 {
+  // This naive implementation is compiled to efficient asm code, thanks to the -avx2 compiler flag. 
   static_assert(isAlignSizeOK(Alignment));
   static_assert(Size > 0 && Size % 32 == 0, "Size must be divisble by 32");
   assert(isPtrAligned<Alignment>(input));
@@ -1012,6 +1013,7 @@ T* max(T* output, const T* input0, const T* input1)
 template <int Size, typename T, int Alignment = NativeAlignment, InstructionType Inst = NativeInstType>
 T maxGlobal(T* input)
 {
+  // This naive implementation is compiled to efficient asm code, thanks to the -avx2 compiler flag.
   static_assert(isAlignSizeOK(Alignment));
   static_assert(Size > 0 && Size % 32 == 0, "Size must be divisble by 32");
   assert(isPtrAligned<Alignment>(input));
