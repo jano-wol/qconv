@@ -28,8 +28,7 @@ void min_h_naive(benchmark::State& state)
   a[59] = -7;
   T ret = 0;
   for (auto _ : state) {
-    ret = minHNaive<Size, T>(a);
-    benchmark::DoNotOptimize(ret);
+    benchmark::DoNotOptimize(ret = minHNaive<Size, T>(a));
   }
   std::ostream cnull(nullptr);
   cnull << ret;
@@ -45,8 +44,7 @@ void min_h_simdops(benchmark::State& state)
   a[59] = -7;
   T ret = 0;
   for (auto _ : state) {
-    ret = simdops::minH<Size, T>(a);
-    benchmark::DoNotOptimize(ret);
+    benchmark::DoNotOptimize(ret = simdops::minH<Size, T>(a));
   }
   std::ostream cnull(nullptr);
   cnull << ret;
@@ -75,8 +73,7 @@ void max_h_naive(benchmark::State& state)
   a[59] = 71;
   T ret = 0;
   for (auto _ : state) {
-    ret = maxHNaive<Size, T>(a);
-    benchmark::DoNotOptimize(ret);
+    benchmark::DoNotOptimize(ret = maxHNaive<Size, T>(a));
   }
   std::ostream cnull(nullptr);
   cnull << ret;
@@ -92,8 +89,7 @@ void max_h_simdops(benchmark::State& state)
   a[59] = 71;
   T ret = 0;
   for (auto _ : state) {
-    ret = simdops::maxH<Size, T>(a);
-    benchmark::DoNotOptimize(ret);
+    benchmark::DoNotOptimize(ret = simdops::maxH<Size, T>(a));
   }
   std::ostream cnull(nullptr);
   cnull << ret;
