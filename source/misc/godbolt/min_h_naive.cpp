@@ -4,7 +4,7 @@
 constexpr size_t Size = 4096;
 using T = int32_t;
 
-T add(T* a)
+T minH(T* a)
 {
   T currMin = a[0];
   for (int i = 0; i < Size; ++i) {
@@ -25,6 +25,6 @@ int main()
     std::cin >> a[i];
   }
 
-  auto ret = add(a);
+  auto ret = minH(a);
   std::cout << ret << "\n";
 }
