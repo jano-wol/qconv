@@ -1,4 +1,4 @@
-// x86-64 gcc 11.4 -O3 -msse4.1 -mavx2
+// x86-64 gcc 11.4 -O3 -mavx2
 #include <immintrin.h>
 #include <iostream>
 

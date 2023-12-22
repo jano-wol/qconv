@@ -4,12 +4,15 @@
 constexpr size_t Size = 4096;
 using T = int32_t;
 
-T* add(T* out, T* in1, T* in2)
+T add(T* a)
 {
+  T currMin = a[0];
   for (int i = 0; i < Size; ++i) {
-    out[i] = in1[i] + in2[i];
+    if (a[i] < currMin) {
+      currMin = a[i];
+    }
   }
-  return out + Size;
+  return currMin;
 }
 
 int main()
@@ -17,17 +20,11 @@ int main()
   using T = int32_t;
 
   alignas(32) T a[Size];
-  alignas(32) T b[Size];
-  alignas(32) T c[Size];
 
   for (int i = 0; i < Size; ++i) {
     std::cin >> a[i];
-    std::cin >> b[i];
   }
 
-  add(c, a, b);
-  for (int i = 0; i < Size; ++i) {
-    std::cout << c[i];
-  }
-  std::cout << "\n";
+  auto ret = add(a);
+  std::cout << ret << "\n";
 }
