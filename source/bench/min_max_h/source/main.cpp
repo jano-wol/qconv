@@ -28,7 +28,9 @@ void min_h_naive(benchmark::State& state)
   a[59] = -7;
   T ret = 0;
   for (auto _ : state) {
-    benchmark::DoNotOptimize(ret = minHNaive<Size, T>(a));
+    ret = minHNaive<Size, T>(a);
+    benchmark::DoNotOptimize(ret);
+    benchmark::ClobberMemory();
   }
   std::ostream cnull(nullptr);
   cnull << ret;
@@ -44,7 +46,9 @@ void min_h_simdops(benchmark::State& state)
   a[59] = -7;
   T ret = 0;
   for (auto _ : state) {
-    benchmark::DoNotOptimize(ret = simdops::minH<Size, T>(a));
+    ret = simdops::minH<Size, T>(a);
+    benchmark::DoNotOptimize(ret);
+    benchmark::ClobberMemory();
   }
   std::ostream cnull(nullptr);
   cnull << ret;
@@ -73,7 +77,9 @@ void max_h_naive(benchmark::State& state)
   a[59] = 71;
   T ret = 0;
   for (auto _ : state) {
-    benchmark::DoNotOptimize(ret = maxHNaive<Size, T>(a));
+    ret = maxHNaive<Size, T>(a);
+    benchmark::DoNotOptimize(ret);
+    benchmark::ClobberMemory();
   }
   std::ostream cnull(nullptr);
   cnull << ret;
@@ -89,7 +95,9 @@ void max_h_simdops(benchmark::State& state)
   a[59] = 71;
   T ret = 0;
   for (auto _ : state) {
-    benchmark::DoNotOptimize(ret = simdops::maxH<Size, T>(a));
+    ret = simdops::maxH<Size, T>(a);
+    benchmark::DoNotOptimize(ret);
+    benchmark::ClobberMemory();
   }
   std::ostream cnull(nullptr);
   cnull << ret;
