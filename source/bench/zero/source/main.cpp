@@ -8,14 +8,22 @@ using namespace qconv;
 using namespace qconv::testutils;
 
 template <typename T, int Size>
+T* zeroNaive(T* out)
+{
+  for (int i = 0; i < Size; ++i) {
+    out[i] = 0;
+  }
+  return out + Size;
+}
+
+template <typename T, int Size>
 void zero_naive(benchmark::State& state)
 {
-  T a[Size];
+  alignas(simdops::NativeAlignment) T a[Size];
   modInit(a, Size, 11);
   for (auto _ : state) {
-    for (int i = 0; i < Size; ++i) {
-      a[i] = 0;
-    }
+    benchmark::DoNotOptimize(zeroNaive<T, Size>(a));
+    benchmark::ClobberMemory();
   }
   checkTrue(a[1] == 0);
 }
@@ -26,18 +34,20 @@ void zero_simdops(benchmark::State& state)
   alignas(simdops::NativeAlignment) T a[Size];
   modInit(a, Size, 11);
   for (auto _ : state) {
-    simdops::zero<Size, T>(a);
+    benchmark::DoNotOptimize(simdops::zero<Size, T>(a));
+    benchmark::ClobberMemory();
   }
   checkTrue(a[1] == 0);
 }
 
 template <typename T, int Size>
-static void zero_memset(benchmark::State& state)
+void zero_memset(benchmark::State& state)
 {
-  T a[Size];
+  alignas(simdops::NativeAlignment) T a[Size];
   modInit(a, Size, 11);
   for (auto _ : state) {
-    std::memset(a, 0, sizeof(T) * Size);
+    benchmark::DoNotOptimize(std::memset(a, 0, sizeof(T) * Size));
+    benchmark::ClobberMemory();
   }
   checkTrue(a[1] == 0);
 }

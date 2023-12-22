@@ -883,6 +883,19 @@ T* zero(T* output)
   return output + B::NumBatch * B::RegWidth;
 }
 
+
+template <int Size, typename T, int Alignment = NativeAlignment, InstructionType Inst = NativeInstType>
+T* zeroCandidate(T* output)
+{
+  typedef detail::VecBatch<Size, T, Inst> B;
+
+  auto zero = _mm256_setzero_si256();
+  for (int i = 0; i < B::NumBatch; ++i){
+    _mm256_store_si256(reinterpret_cast<__m256i*>(output + i * B::RegWidth), zero);
+  }
+  return output + B::NumBatch * B::RegWidth;
+}
+
 /// Copy an array from input to output. Return the end pointer of the output array.
 template <int Size, typename T, int Alignment = NativeAlignment, InstructionType Inst = NativeInstType>
 T* copy(T* output, const T* input)
