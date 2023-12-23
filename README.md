@@ -31,5 +31,7 @@ After the setup is done, the repo can be configured, builded, tested and benchma
   
 # Compiler
 The default compiler of qconv is clang. gcc is also perfectly fine to compile qconv, 
-the only advantage of clang is that experience shows that the google benchmark results are more consistent with the clang compiled binaries than with the gcc compiled binaries. 
-
+the only advantage of clang is that experience shows that the google benchmark results are more consistent with the clang compiled binaries than with the gcc compiled binaries. Compilers can be switched by changing in ./source/scripts/build/init.sh 
+CMAKE_CXX_COMPILER=clang++  
+to  
+CMAKE_CXX_COMPILER=g++  
