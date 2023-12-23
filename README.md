@@ -9,7 +9,7 @@ cmake
 ninja  
 clang  
 
-## Setup method 1 (tested on Ubuntu 22.04):  
+### Setup method 1 (tested on Ubuntu 22.04):  
 sudo snap install cmake --classic  
 sudo apt-get -y install ninja-build  
 sudo apt install clang  
@@ -17,7 +17,7 @@ sudo apt install libstdc++-12-dev
 sudo apt-get install libc++-dev  
 sudo apt install libc++abi-dev  
 
-## Setup method 2 (docker):
+### Setup method 2 (docker):
 
 # Build, test and benchmark qconv
 After the setup, the repo can be configured, build, tested and benchmarked with the following commands:  
