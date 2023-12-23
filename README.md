@@ -20,7 +20,7 @@ sudo apt install libc++abi-dev
 ## Setup method 2 (docker):
 
 # Build and test the repo
-After setup the repo can be configured, build, tested and benchmarked with the following commands:  
+After the setup, the repo can be configured, build, tested and benchmarked with the following commands:  
 ./source/scripts/configure.sh release  
 ./source/scripts/build.sh release  
 ./source/scripts/test.sh release  
