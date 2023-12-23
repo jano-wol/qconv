@@ -22,7 +22,7 @@ A Docker image can be builded and runned with the following commands (casted fro
 sudo ./source/scripts/misc/docker/build.sh  
 sudo ./source/scripts/misc/docker/run.sh
 
-# Build, test and benchmark qconv
+# Configure, build, test and benchmark qconv
 After the setup is done, the repo can be configured, builded, tested and benchmarked with the following commands (casted from the root of the repo):  
 ./source/scripts/configure.sh release  
 ./source/scripts/build.sh release  
