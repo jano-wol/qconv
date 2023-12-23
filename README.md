@@ -1,7 +1,7 @@
 # qconv
 qconv is a performant C++ library using AVX2 instructions to implement fundamental algorithms like: minimum search, relu, vector addition, quantitized fully connected layers, quantitized convolutional layers with kernel 3x3. (These algorithms and layers are the buiding blocks of neural networks.) All of the implemented algorithms are tested by google tests, and benchmarked by google benchmark.
 
-# Setup repo
+# Setup qconv
 Supported os: Linux  
 
 Known dependencies:  
@@ -19,7 +19,7 @@ sudo apt install libc++abi-dev
 
 ## Setup method 2 (docker):
 
-# Build and test the repo
+# Build, test and benchmark qconv
 After the setup, the repo can be configured, build, tested and benchmarked with the following commands:  
 ./source/scripts/configure.sh release  
 ./source/scripts/build.sh release  
