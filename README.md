@@ -1,5 +1,5 @@
 # qconv
-qconv is a performant C++ library using AVX2 instructions to implement fundamental algorithms like: minimum search, relu, vector addition, quantitized fully connected layers, quantitized convolutional layers with kernel 3x3. (These algorithms and layers are the buiding blocks of neural networks.) All of the implemented algorithms are tested by google tests, and benchmarked by google benchmark.
+qconv is a performant C++ library using AVX2 intrinsics to implement fundamental algorithms and layers like minimum search, relu, vector addition, quantitized fully connected layers, quantitized convolutional layers with kernel 3x3. (These algorithms and layers are the fundamental buiding blocks of neural networks.) All of the implemented algorithms are tested by google tests, and benchmarked by google benchmark.
 
 # Setup qconv
 Supported os: Linux  
