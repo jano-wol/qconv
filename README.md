@@ -19,7 +19,7 @@ sudo apt install libc++abi-dev
 
 ### Setup Method 2 (Docker):
 A Docker image can be builded and runned with the following commands (casted from the root of the repo):  
-sudo ./source/scripts/misc/docker/build.sh 
+sudo ./source/scripts/misc/docker/build.sh  
 sudo ./source/scripts/misc/docker/run.sh
 
 # Build, test and benchmark qconv
