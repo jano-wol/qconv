@@ -2,14 +2,14 @@
 #include <immintrin.h>
 #include <iostream>
 
-constexpr size_t Size = 4096;
+constexpr uint32_t Size = 4096;
 using T = int32_t;
 
 struct VecBatch
 {
-  static constexpr size_t SimdBits = 256;
-  static constexpr size_t RegWidth = SimdBits ? (SimdBits / 8) / sizeof(T) : 1;
-  static constexpr size_t NumBatch = Size / RegWidth;
+  static constexpr uint32_t SimdBits = 256;
+  static constexpr uint32_t RegWidth = SimdBits ? (SimdBits / 8) / sizeof(T) : 1;
+  static constexpr uint32_t NumBatch = Size / RegWidth;
 };
 
 struct VecLoadStore

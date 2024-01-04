@@ -51,7 +51,7 @@ void weightInit_32_512(T a[32][512])
 template <typename PrintType>
 void printLongRegister(__m128i v)
 {
-  constexpr size_t N = sizeof(__m128i) / sizeof(PrintType);
+  constexpr uint32_t N = sizeof(__m128i) / sizeof(PrintType);
   PrintType values[N];
   _mm_storeu_si128(values, v);
   for (int i = 0; i < N; ++i) {
@@ -63,7 +63,7 @@ void printLongRegister(__m128i v)
 template <typename PrintType>
 void printLongRegister(__m256i v)
 {
-  constexpr size_t N = sizeof(__m256i) / sizeof(PrintType);
+  constexpr uint32_t N = sizeof(__m256i) / sizeof(PrintType);
   PrintType values[N];
   _mm256_storeu_si256(values, v);
   for (int i = 0; i < N; ++i) {

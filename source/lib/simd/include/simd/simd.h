@@ -13,8 +13,8 @@ static_assert(false, "Currently only AVX2 is supported");
 namespace qconv::simd
 {
 #if defined(USE_AVX2)
-constexpr size_t Alignment = 32;
-constexpr size_t RegisterWidth = 256;
+constexpr uint32_t Alignment = 32;
+constexpr uint32_t RegisterWidth = 256;
 #else
 static_assert(false, "Currently only AVX2 is supported");
 #endif
