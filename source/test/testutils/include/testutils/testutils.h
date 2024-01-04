@@ -81,8 +81,8 @@ void printLongRegister(__m128i v)
 {
   constexpr size_t N = sizeof(__m128i) / sizeof(PrintType);
   PrintType values[N];
-  _mm_storeu_si128(values, v);
-  for (int i = 0; i < N; ++i) {
+  _mm_storeu_si128(reinterpret_cast<__m128i_u*>(values), v);
+  for (size_t i = 0; i < N; ++i) {
     std::cout << static_cast<int>(values[i]) << " ";
   }
   std::cout << "\n";
@@ -93,8 +93,8 @@ void printLongRegister(__m256i v)
 {
   constexpr size_t N = sizeof(__m256i) / sizeof(PrintType);
   PrintType values[N];
-  _mm256_storeu_si256(values, v);
-  for (int i = 0; i < N; ++i) {
+  _mm256_storeu_si256(reinterpret_cast<__m256i_u*>(values), v);
+  for (size_t i = 0; i < N; ++i) {
     std::cout << static_cast<int>(values[i]) << " ";
   }
   std::cout << "\n";
