@@ -4,8 +4,6 @@
 #include <iostream>
 #include <random>
 
-#include <simdops/simdops.h>
-
 namespace qconv::testutils
 {
 template <typename T>
@@ -49,11 +47,11 @@ void weightInit_32_512(T a[32][512])
 }
 
 template <typename PrintType>
-void printLongRegister(simde__m128i v)
+void printLongRegister(__m128i v)
 {
-  constexpr size_t N = sizeof(simde__m128i) / sizeof(PrintType);
+  constexpr size_t N = sizeof(__m128i) / sizeof(PrintType);
   PrintType values[N];
-  simde_mm_storeu_si128(values, v);
+  _mm_storeu_si128(values, v);
   for (int i = 0; i < N; ++i) {
     std::cout << static_cast<int>(values[i]) << " ";
   }
@@ -61,11 +59,11 @@ void printLongRegister(simde__m128i v)
 }
 
 template <typename PrintType>
-void printLongRegister(simde__m256i v)
+void printLongRegister(__m256i v)
 {
-  constexpr size_t N = sizeof(simde__m256i) / sizeof(PrintType);
+  constexpr size_t N = sizeof(__m256i) / sizeof(PrintType);
   PrintType values[N];
-  simde_mm256_storeu_si256(values, v);
+  _mm256_storeu_si256(values, v);
   for (int i = 0; i < N; ++i) {
     std::cout << static_cast<int>(values[i]) << " ";
   }
