@@ -1,6 +1,7 @@
 ﻿set(target layer-tests)
 
 set(sources
+    TestLinear.cpp
 	TestQConv.cpp
 )
 

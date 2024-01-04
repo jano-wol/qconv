@@ -19,9 +19,9 @@ void qconv_naive(benchmark::State& state)
   modInit(weights, SpatialIn * SpatialOut * 3 * 3, 11);
   QConvNaive<SpatialIn, SpatialOut, 20, 3> q;
   q.initWeights(weights);
-
   for (auto _ : state) {
     q.propagate(input);
+    benchmark::ClobberMemory();
   }
   checkTrue(q.outputBuf[0] != 1);
 }
@@ -37,11 +37,11 @@ void qconv_simdops(benchmark::State& state)
   modInit(weights, SpatialIn * SpatialOut * 3 * 3, 11);
   QConv<SpatialIn, SpatialOut, 20, 3> q;
   q.initWeights(weights);
-
   for (auto _ : state) {
     q.propagate(input);
+    benchmark::ClobberMemory();
   }
-  checkTrue(1 == 1);
+  checkTrue(q.outputBuf[0] != 1);
 }
 BENCHMARK(qconv_simdops);
 BENCHMARK_MAIN();

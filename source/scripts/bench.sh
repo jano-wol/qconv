@@ -8,6 +8,6 @@ source "$(dirname "${0}")/build/init.sh"
 #${BUILD_FOLDER}/bin/min_max-bench
 #${BUILD_FOLDER}/bin/min_max_h-bench
 #${BUILD_FOLDER}/bin/relu-bench
-#${BUILD_FOLDER}/bin/linear-bench
+${BUILD_FOLDER}/bin/linear-bench
 ${BUILD_FOLDER}/bin/qconv-bench
 

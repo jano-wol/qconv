@@ -159,7 +159,7 @@ TEST(QConv, CompareWithNaive)
   QConv<SpatialIn, SpatialOut, 20, 3> q;
   QConvNaive<SpatialIn, SpatialOut, 20, 3> qN;
 
-  // random alignment
+  // random input
   randInit<int8_t>(input, SpatialIn * 20 * 20);
   randInit<int16_t>(weights, SpatialIn * SpatialOut * 3 * 3);
   q.initWeights(weights);

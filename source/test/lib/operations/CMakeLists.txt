@@ -1,4 +1,4 @@
-﻿set(target simdops-tests)
+﻿set(target operations-tests)
 
 set(sources
 	TestMinMaxH.cpp

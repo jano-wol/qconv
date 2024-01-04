@@ -1,7 +1,7 @@
 #add_subdirectory(add)
 #add_subdirectory(copy)
 #add_subdirectory(dilate)
-#add_subdirectory(linear)
+add_subdirectory(linear)
 #add_subdirectory(min_max)
 #add_subdirectory(min_max_h)
 add_subdirectory(qconv)

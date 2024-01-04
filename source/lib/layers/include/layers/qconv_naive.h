@@ -1,9 +1,6 @@
 #ifndef QCONV_LAYERS_QCONV_NAIVE_H_INCLUDED
 #define QCONV_LAYERS_QCONV_NAIVE_H_INCLUDED
 
-#include <fstream>
-#include <sstream>
-
 #include <simd/simd.h>
 
 namespace qconv::layers
@@ -58,22 +55,6 @@ public:
         }
       }
     }
-  }
-
-  bool read_parameters(std::istream& stream)
-  {
-    std::string s;
-    std::getline(stream, s);
-    std::stringstream ss(std::move(s));
-    std::string curr;
-    size_t idx = 0;
-    WeightType w[SpatialIn * SpatialOut * KernelSize * KernelSize];
-    while (ss >> curr) {
-      weights[idx] = std::stof(curr);
-      ++idx;
-    }
-    initWeights(w);
-    return !stream.fail();
   }
 
   void initWeights(WeightType* w)

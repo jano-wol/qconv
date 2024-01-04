@@ -1,9 +1,6 @@
 #ifndef QCONV_LAYERS_QCONV_H_INCLUDED
 #define QCONV_LAYERS_QCONV_H_INCLUDED
 
-#include <fstream>
-#include <sstream>
-
 #include <simd/simd.h>
 
 static inline int32_t hsum_epi32(__m128i x)
@@ -28,22 +25,6 @@ class QConv
 {
 public:
   static_assert(KernelSize == 3, "Only 3x3 kernels are supported now!");
-
-  bool read_parameters(std::istream& stream)
-  {
-    std::string s;
-    std::getline(stream, s);
-    std::stringstream ss(std::move(s));
-    std::string curr;
-    size_t idx = 0;
-    int16_t w[SpatialIn * SpatialOut * KernelSize * KernelSize];
-    while (ss >> curr) {
-      w[idx] = std::stof(curr);
-      ++idx;
-    }
-    initWeights(w);
-    return !stream.fail();
-  }
 
   void initWeights(int16_t* w)
   {
