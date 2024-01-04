@@ -1,7 +1,7 @@
 // x86-64 gcc 11.4 -O3 -mavx2
 #include <iostream>
 
-constexpr uint32_t Size = 4096;
+constexpr size_t Size = 4096;
 using T = int32_t;
 
 T* zeroNaive(T* out)

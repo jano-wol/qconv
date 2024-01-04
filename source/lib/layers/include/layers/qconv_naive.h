@@ -7,7 +7,7 @@
 
 namespace qconv::layers
 {
-template <uint32_t SpatialIn, uint32_t SpatialOut, uint32_t SpatialSize, uint32_t KernelSize>
+template <size_t SpatialIn, size_t SpatialOut, size_t SpatialSize, size_t KernelSize>
 class QConvNaive
 {
 public:
@@ -24,7 +24,7 @@ public:
     std::getline(stream, s);
     std::stringstream ss(std::move(s));
     std::string curr;
-    uint32_t idx = 0;
+    size_t idx = 0;
     WeightType w[SpatialIn * SpatialOut * KernelSize * KernelSize];
     while (ss >> curr) {
       weights[idx] = std::stof(curr);
@@ -37,16 +37,16 @@ public:
   void initWeights(WeightType* w)
   {
     initTiles();
-    for (uint32_t i = 0; i < SpatialIn * SpatialOut * KernelSize * KernelSize; ++i) {
+    for (size_t i = 0; i < SpatialIn * SpatialOut * KernelSize * KernelSize; ++i) {
       weights[i] = w[i];
     }
   }
 
   void propagate(InputType* input)
   {
-    for (uint32_t i = 0; i < SpatialSize * SpatialSize; ++i) {
-      for (uint32_t j = 0; j < SpatialOut; ++j) {
-        uint32_t w = j * SpatialIn * KernelSize * KernelSize;
+    for (size_t i = 0; i < SpatialSize * SpatialSize; ++i) {
+      for (size_t j = 0; j < SpatialOut; ++j) {
+        size_t w = j * SpatialIn * KernelSize * KernelSize;
         int sum = 0;
         for (int m = 0; m < 10; ++m) {
           int g = tileAbsolute[1][i][m];
@@ -54,7 +54,7 @@ public:
           if (g == -1) {
             break;
           }
-          for (uint32_t k = 0; k < SpatialIn; ++k) {
+          for (size_t k = 0; k < SpatialIn; ++k) {
             sum += input[k * SpatialSize * SpatialSize + g] * weights[w + k * KernelSize * KernelSize + l];
           }
         }

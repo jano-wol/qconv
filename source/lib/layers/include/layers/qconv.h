@@ -24,7 +24,7 @@ static inline int32_t hsum_8x32(__m256i v)
 
 namespace qconv::layers
 {
-template <uint32_t SpatialIn, uint32_t SpatialOut, uint32_t SpatialSize, uint32_t KernelSize>
+template <size_t SpatialIn, size_t SpatialOut, size_t SpatialSize, size_t KernelSize>
 class QConv
 {
 public:
@@ -36,7 +36,7 @@ public:
     std::getline(stream, s);
     std::stringstream ss(std::move(s));
     std::string curr;
-    uint32_t idx = 0;
+    size_t idx = 0;
     int16_t w[SpatialIn * SpatialOut * KernelSize * KernelSize];
     while (ss >> curr) {
       w[idx] = std::stof(curr);
@@ -48,9 +48,9 @@ public:
 
   void initWeights(int16_t* w)
   {
-    uint32_t weightsEnvIdx = 0;
-    uint32_t weightsCIdx = 0;
-    for (uint32_t i = 0; i < SpatialIn * SpatialOut * KernelSize * KernelSize; i += KernelSize * KernelSize) {
+    size_t weightsEnvIdx = 0;
+    size_t weightsCIdx = 0;
+    for (size_t i = 0; i < SpatialIn * SpatialOut * KernelSize * KernelSize; i += KernelSize * KernelSize) {
       weightsEnv[weightsEnvIdx] =
           _mm256_setr_epi32(w[i + 0], w[i + 1], w[i + 2], w[i + 3], w[i + 5], w[i + 6], w[i + 7], w[i + 8]);
       ++weightsEnvIdx;
@@ -61,7 +61,7 @@ public:
 
   void initEnv(int8_t* input)
   {
-    for (uint32_t i = 0; i < SpatialSize * SpatialSize; ++i) {
+    for (size_t i = 0; i < SpatialSize * SpatialSize; ++i) {
       if (i == 0) {
         env[i] = _mm256_setr_epi32(0, 0, 0, 0, input[i + 1], 0, input[i + SpatialSize], input[i + SpatialSize + 1]);
       } else if (i == SpatialSize - 1) {
@@ -94,11 +94,11 @@ public:
   void propagate(int8_t* input)
   {
     memset(outputBuf, 0, SpatialOut * SpatialSize * SpatialSize * sizeof(int32_t));
-    for (uint32_t i = 0; i < SpatialIn; ++i) {
+    for (size_t i = 0; i < SpatialIn; ++i) {
       initEnv(input + i * SpatialSize * SpatialSize);
-      for (uint32_t j = 0; j < SpatialOut; ++j) {
+      for (size_t j = 0; j < SpatialOut; ++j) {
         auto w = weightsEnv[j * SpatialIn + i];
-        for (uint32_t k = 0; k < SpatialSize * SpatialSize; ++k) {
+        for (size_t k = 0; k < SpatialSize * SpatialSize; ++k) {
           auto x = _mm256_mullo_epi32(env[k], w);
           auto y = hsum_8x32(x);
           outputBuf[j * SpatialSize * SpatialSize + k] += y;
@@ -107,7 +107,7 @@ public:
         constexpr int StepWidth = (simd::RegisterWidth / 8) / sizeof(int32_t);
         __m128i c = _mm_set1_epi32(static_cast<int32_t>(weightsC[j * SpatialIn + i]));
         __m256i C = _mm256_set_m128i(c, c);
-        for (uint32_t b = 0; b < SpatialSize * SpatialSize / StepWidth; ++b) {
+        for (size_t b = 0; b < SpatialSize * SpatialSize / StepWidth; ++b) {
           int inIdx = i * SpatialSize * SpatialSize + b * StepWidth;
           int outIdx = j * SpatialSize * SpatialSize + b * StepWidth;
           auto data = _mm256_setr_epi32(input[inIdx], input[inIdx + 1], input[inIdx + 2], input[inIdx + 3],

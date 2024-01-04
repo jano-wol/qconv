@@ -2,7 +2,7 @@
 #include <cstring>
 #include <iostream>
 
-constexpr uint32_t Size = 4096;
+constexpr size_t Size = 4096;
 using T = int32_t;
 
 T* copyMemcopy(T* out, T* in)
