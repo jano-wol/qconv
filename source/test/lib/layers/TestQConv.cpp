@@ -1,5 +1,7 @@
 #include <gmock/gmock.h>
 
+#include <cstring>
+
 #include <layers/qconv.h>
 #include <layers/qconv_naive.h>
 #include <testutils/testutils.h>

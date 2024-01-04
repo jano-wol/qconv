@@ -3,12 +3,11 @@
 
 #include <fstream>
 
-#include <layers/common.h>
 #include <layers/tile.h>
 
 namespace qconv::layers
 {
-template <IndexType SpatialIn, IndexType SpatialOut, IndexType SpatialSize, IndexType KernelSize>
+template <uint32_t SpatialIn, uint32_t SpatialOut, uint32_t SpatialSize, uint32_t KernelSize>
 class QConvNaive
 {
 public:

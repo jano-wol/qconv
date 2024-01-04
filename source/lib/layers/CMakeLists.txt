@@ -1,8 +1,7 @@
 set(target layers)
 set(include_path "${CMAKE_CURRENT_SOURCE_DIR}/include/${target}")
 set(source_path "${CMAKE_CURRENT_SOURCE_DIR}/source")
-set(headers ${include_path}/common.h
-            ${include_path}/qconv.h
+set(headers ${include_path}/qconv.h
             ${include_path}/tile.h
             )
 set(sources ${source_path}/tile.cpp

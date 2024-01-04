@@ -2,8 +2,8 @@
 #define QCONV_LAYERS_QCONV_H_INCLUDED
 
 #include <fstream>
+#include <sstream>
 
-#include <layers/common.h>
 #include <layers/tile.h>
 #include <simd/simd.h>
 
@@ -24,7 +24,7 @@ static inline int32_t hsum_8x32(__m256i v)
 
 namespace qconv::layers
 {
-template <IndexType SpatialIn, IndexType SpatialOut, IndexType SpatialSize, IndexType KernelSize>
+template <uint32_t SpatialIn, uint32_t SpatialOut, uint32_t SpatialSize, uint32_t KernelSize>
 class QConv
 {
 public:
@@ -104,7 +104,7 @@ public:
           outputBuf[j * SpatialSize * SpatialSize + k] += y;
         }
 
-        constexpr int StepWidth = (simd::RegisterWidth / 8) / sizeof(int32_t); 
+        constexpr int StepWidth = (simd::RegisterWidth / 8) / sizeof(int32_t);
         __m128i c = _mm_set1_epi32(static_cast<int32_t>(weightsC[j * SpatialIn + i]));
         __m256i C = _mm256_set_m128i(c, c);
         for (int b = 0; b < SpatialSize * SpatialSize / StepWidth; ++b) {

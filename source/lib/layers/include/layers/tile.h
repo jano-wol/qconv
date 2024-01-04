@@ -1,8 +1,6 @@
 #ifndef QCONV_LAYERS_TILE_H_INCLUDED
 #define QCONV_LAYERS_TILE_H_INCLUDED
 
-#include <layers/common.h>
-
 constexpr int BOARDS = 20;
 constexpr int TSIZE = (BOARDS * BOARDS);
 
