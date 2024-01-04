@@ -18,7 +18,7 @@ void linear_naive_512x32_int8_t(benchmark::State& state)
 
   modInit(input, 512, 11);
   modInit(biases, 32, 11);
-  weightInit_32_512(weights);
+  modInit<int8_t, 32, 512>(weights, 128);
   LinearNaive<512, 32> l;
   l.init(weights, biases);
   for (auto _ : state) {
@@ -40,7 +40,7 @@ void linear_simdops_512x32_int8_t(benchmark::State& state)
 
   modInit(input, 512, 11);
   modInit(biases, 32, 11);
-  weightInit_32_512(weights);
+  modInit<int8_t, 32, 512>(weights, 128);
   Linear<512, 32> l;
   l.init(weights, biases);
   for (auto _ : state) {

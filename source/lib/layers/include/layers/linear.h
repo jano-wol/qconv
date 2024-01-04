@@ -38,16 +38,6 @@ public:
   using WeightType = int8_t;
   using OutputType = int32_t;
 
-  void init(WeightType* w, OutputType* b)
-  {
-    for (size_t i = 0; i < InSize * OutSize; ++i) {
-      weights[i / InSize][i % InSize] = w[i];
-    }
-    for (size_t i = 0; i < OutSize; ++i) {
-      biases[i] = b[i];
-    }
-  }
-
   void init(WeightType w[OutSize][InSize], OutputType b[OutSize])
   {
     for (size_t i = 0; i < OutSize; ++i) {

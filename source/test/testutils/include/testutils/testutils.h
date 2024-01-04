@@ -16,11 +16,33 @@ void constInit(T* a, int s, T v)
   }
 }
 
+template <typename T, size_t X, size_t Y>
+void constInit(T a[X][Y], T v)
+{
+  for (size_t i = 0; i < X; ++i) {
+    for (size_t j = 0; j < Y; ++j) {
+      a[i][j] = v;
+    }
+  }
+}
+
 template <typename T>
 void modInit(T* a, int s, int mod)
 {
   for (int i = 0; i < s; ++i) {
     a[i] = i % mod;
+  }
+}
+
+template <typename T, size_t X, size_t Y>
+void modInit(T a[X][Y], int mod)
+{
+  size_t n = 0;
+  for (size_t i = 0; i < X; ++i) {
+    for (size_t j = 0; j < Y; ++j) {
+      a[i][j] = (i + j) % mod;
+      ++n;
+    }
   }
 }
 
@@ -38,12 +60,18 @@ void randInit(T* a, int s)
   }
 }
 
-template <typename T>
-void weightInit_32_512(T a[32][512])
+template <typename T, size_t X, size_t Y>
+void randInit(T a[X][Y])
 {
-  for (int i = 0; i < 32; ++i) {
-    for (int j = 0; j < 512; ++j) {
-      a[i][j] = (i + j) % 128;
+  std::mt19937 e;
+  unsigned long long mod = (1UL << (sizeof(T) * 8));
+  for (size_t i = 0; i < X; ++i) {
+    for (size_t j = 0; j < Y; ++j) {
+      int r = e() % mod;
+      if (std::is_signed<T>::value) {
+        r -= (mod / 2);
+      }
+      a[i][j] = r;
     }
   }
 }

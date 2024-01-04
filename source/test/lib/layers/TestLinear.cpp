@@ -16,12 +16,12 @@ TEST(Linear, AllOne)
   constexpr int InSize = 512;
   constexpr int OutSize = 32;
   alignas(Alignment) int8_t input[InSize];
-  alignas(Alignment) int8_t weights[InSize * OutSize];
+  alignas(Alignment) int8_t weights[OutSize][InSize];
   alignas(Alignment) int32_t biases[OutSize];
   Linear<InSize, OutSize> l;
   LinearNaive<InSize, OutSize> lN;
   constInit(input, InSize, static_cast<int8_t>(1));
-  constInit(weights, InSize * OutSize, static_cast<int8_t>(1));
+  constInit<int8_t, OutSize, InSize>(weights, static_cast<int8_t>(1));
   constInit(biases, OutSize, static_cast<int32_t>(1));
   l.init(weights, biases);
   l.propagate(input);
