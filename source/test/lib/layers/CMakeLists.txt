@@ -9,7 +9,7 @@ add_executable(${target} ${sources})
 target_link_libraries(${target}
 	PUBLIC
 	layers
-	simdops
+	simd
 	testutils
 	PRIVATE
 	gmock-dev

@@ -1,2 +1,2 @@
 add_subdirectory(layers)
-add_subdirectory(simdops)
+#add_subdirectory(simdops)

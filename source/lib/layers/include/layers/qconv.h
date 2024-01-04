@@ -104,8 +104,9 @@ public:
           outputBuf[j * SpatialSize * SpatialSize + k] += y;
         }
 
-        constexpr int StepWidth = simd::RegisterWidth / sizeof(int32_t); 
-        __m256i C = _mm_set1_epi32(static_cast<int32_t>(weightsC[j * SpatialIn + i]));
+        constexpr int StepWidth = (simd::RegisterWidth / 8) / sizeof(int32_t); 
+        __m128i c = _mm_set1_epi32(static_cast<int32_t>(weightsC[j * SpatialIn + i]));
+        __m256i C = _mm256_set_m128i(c, c);
         for (int b = 0; b < SpatialSize * SpatialSize / StepWidth; ++b) {
           int inIdx = i * SpatialSize * SpatialSize + b * StepWidth;
           int outIdx = j * SpatialSize * SpatialSize + b * StepWidth;

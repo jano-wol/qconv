@@ -1,6 +1,7 @@
 #ifndef QCONV_SIMD_SIMD_H_INCLUDED
 #define QCONV_SIMD_SIMD_H_INCLUDED
 
+#include <cstdint>
 #include <cstdio>
 
 #if defined(USE_AVX2)

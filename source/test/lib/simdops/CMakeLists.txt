@@ -8,7 +8,7 @@ add_executable(${target} ${sources})
 
 target_link_libraries(${target}
 	PUBLIC
-	simdops
+	simd
 	testutils
 	PRIVATE
 	gmock-dev

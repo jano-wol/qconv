@@ -6,15 +6,15 @@
 
 using namespace qconv;
 using namespace qconv::layers;
-using namespace qconv::simdops;
+using namespace qconv::simd;
 using namespace qconv::testutils;
 
 TEST(QConv, AllOne)
 {
   constexpr int SpatialIn = 16;
   constexpr int SpatialOut = 16;
-  alignas(NativeAlignment) int8_t input[SpatialIn * 20 * 20];
-  alignas(NativeAlignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
+  alignas(Alignment) int8_t input[SpatialIn * 20 * 20];
+  alignas(Alignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
   QConv<SpatialIn, SpatialOut, 20, 3> q;
   QConvNaive<SpatialIn, SpatialOut, 20, 3> qN;
   constInit(input, SpatialIn * 20 * 20, static_cast<int8_t>(1));
@@ -47,8 +47,8 @@ TEST(QConv, WeightVariant1)
 {
   constexpr int SpatialIn = 16;
   constexpr int SpatialOut = 16;
-  alignas(NativeAlignment) int8_t input[SpatialIn * 20 * 20];
-  alignas(NativeAlignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
+  alignas(Alignment) int8_t input[SpatialIn * 20 * 20];
+  alignas(Alignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
   QConv<SpatialIn, SpatialOut, 20, 3> q;
   QConvNaive<SpatialIn, SpatialOut, 20, 3> qN;
   constInit(input, SpatialIn * 20 * 20, static_cast<int8_t>(1));
@@ -75,8 +75,8 @@ TEST(QConv, WeightVariant2)
 {
   constexpr int SpatialIn = 16;
   constexpr int SpatialOut = 16;
-  alignas(NativeAlignment) int8_t input[SpatialIn * 20 * 20];
-  alignas(NativeAlignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
+  alignas(Alignment) int8_t input[SpatialIn * 20 * 20];
+  alignas(Alignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
   QConv<SpatialIn, SpatialOut, 20, 3> q;
   QConvNaive<SpatialIn, SpatialOut, 20, 3> qN;
   constInit(input, SpatialIn * 20 * 20, static_cast<int8_t>(1));
@@ -97,8 +97,8 @@ TEST(QConv, WeightVariant3)
 {
   constexpr int SpatialIn = 16;
   constexpr int SpatialOut = 16;
-  alignas(NativeAlignment) int8_t input[SpatialIn * 20 * 20];
-  alignas(NativeAlignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
+  alignas(Alignment) int8_t input[SpatialIn * 20 * 20];
+  alignas(Alignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
   QConv<SpatialIn, SpatialOut, 20, 3> q;
   QConvNaive<SpatialIn, SpatialOut, 20, 3> qN;
   constInit(input, SpatialIn * 20 * 20, static_cast<int8_t>(1));
@@ -121,8 +121,8 @@ TEST(QConv, InputVariant)
 {
   constexpr int SpatialIn = 16;
   constexpr int SpatialOut = 16;
-  alignas(NativeAlignment) int8_t input[SpatialIn * 20 * 20];
-  alignas(NativeAlignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
+  alignas(Alignment) int8_t input[SpatialIn * 20 * 20];
+  alignas(Alignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
   QConv<SpatialIn, SpatialOut, 20, 3> q;
   QConvNaive<SpatialIn, SpatialOut, 20, 3> qN;
   constInit(input, SpatialIn * 20 * 20, static_cast<int8_t>(1));
@@ -152,8 +152,8 @@ TEST(QConv, CompareWithNaive)
 {
   constexpr int SpatialIn = 16;
   constexpr int SpatialOut = 16;
-  alignas(NativeAlignment) int8_t input[SpatialIn * 20 * 20];
-  alignas(NativeAlignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
+  alignas(Alignment) int8_t input[SpatialIn * 20 * 20];
+  alignas(Alignment) int16_t weights[SpatialIn * SpatialOut * 3 * 3];
   QConv<SpatialIn, SpatialOut, 20, 3> q;
   QConvNaive<SpatialIn, SpatialOut, 20, 3> qN;
 

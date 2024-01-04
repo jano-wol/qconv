@@ -4,6 +4,8 @@
 #include <iostream>
 #include <random>
 
+#include <simd/simd.h>
+
 namespace qconv::testutils
 {
 template <typename T>
