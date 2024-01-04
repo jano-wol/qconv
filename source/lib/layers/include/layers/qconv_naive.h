@@ -63,7 +63,7 @@ public:
     }
   }
 
-  WeightType weights[SpatialIn * SpatialOut * KernelSize * KernelSize];
+  alignas(simd::Alignment) WeightType weights[SpatialIn * SpatialOut * KernelSize * KernelSize];
   OutputBuffer outputBuf;
 };
 }  // namespace qconv::layers

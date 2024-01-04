@@ -27,7 +27,6 @@ void qconv_naive(benchmark::State& state)
 }
 BENCHMARK(qconv_naive);
 
-#ifdef USE_AVX2
 void qconv_simdops(benchmark::State& state)
 {
   constexpr int SpatialIn = 16;
@@ -45,5 +44,4 @@ void qconv_simdops(benchmark::State& state)
   checkTrue(1 == 1);
 }
 BENCHMARK(qconv_simdops);
-#endif
 BENCHMARK_MAIN();
