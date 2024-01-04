@@ -9,9 +9,9 @@
 namespace qconv::testutils
 {
 template <typename T>
-void constInit(T* a, int s, T v)
+void constInit(T* a, size_t s, T v)
 {
-  for (int i = 0; i < s; ++i) {
+  for (size_t i = 0; i < s; ++i) {
     a[i] = v;
   }
 }
@@ -27,9 +27,9 @@ void constInit(T a[X][Y], T v)
 }
 
 template <typename T>
-void modInit(T* a, int s, int mod)
+void modInit(T* a, size_t s, int mod)
 {
-  for (int i = 0; i < s; ++i) {
+  for (size_t i = 0; i < s; ++i) {
     a[i] = i % mod;
   }
 }
@@ -47,11 +47,11 @@ void modInit(T a[X][Y], int mod)
 }
 
 template <typename T>
-void randInit(T* a, int s)
+void randInit(T* a, size_t s)
 {
   std::mt19937 e;
   unsigned long long mod = (1UL << (sizeof(T) * 8));
-  for (int i = 0; i < s; ++i) {
+  for (size_t i = 0; i < s; ++i) {
     int r = e() % mod;
     if (std::is_signed<T>::value) {
       r -= (mod / 2);
