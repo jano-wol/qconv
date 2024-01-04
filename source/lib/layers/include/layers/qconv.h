@@ -25,8 +25,11 @@ class QConv
 {
 public:
   static_assert(KernelSize == 3, "Only 3x3 kernels are supported now!");
+  using InputType = int8_t;
+  using WeightType = int16_t;
+  using OutputType = int32_t;
 
-  void initWeights(int16_t* w)
+  void initWeights(WeightType* w)
   {
     size_t weightsEnvIdx = 0;
     size_t weightsCIdx = 0;
@@ -39,7 +42,7 @@ public:
     }
   }
 
-  void initEnv(int8_t* input)
+  void initEnv(InputType* input)
   {
     for (size_t i = 0; i < SpatialSize * SpatialSize; ++i) {
       if (i == 0) {
@@ -71,9 +74,9 @@ public:
   }
 
   // Forward propagation
-  void propagate(int8_t* input)
+  void propagate(InputType* input)
   {
-    memset(outputBuf, 0, SpatialOut * SpatialSize * SpatialSize * sizeof(int32_t));
+    memset(outputBuf, 0, SpatialOut * SpatialSize * SpatialSize * sizeof(OutputType));
     for (size_t i = 0; i < SpatialIn; ++i) {
       initEnv(input + i * SpatialSize * SpatialSize);
       for (size_t j = 0; j < SpatialOut; ++j) {
@@ -102,9 +105,9 @@ public:
   }
 
   alignas(simd::Alignment) __m256i weightsEnv[SpatialIn * SpatialOut];
-  alignas(simd::Alignment) int16_t weightsC[SpatialIn * SpatialOut];
+  alignas(simd::Alignment) WeightType weightsC[SpatialIn * SpatialOut];
   alignas(simd::Alignment) __m256i env[SpatialSize * SpatialSize];
-  alignas(simd::Alignment) int32_t outputBuf[SpatialOut * SpatialSize * SpatialSize];
+  alignas(simd::Alignment) OutputType outputBuf[SpatialOut * SpatialSize * SpatialSize];
 };
 }  // namespace qconv::layers
 
