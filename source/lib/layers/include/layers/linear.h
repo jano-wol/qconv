@@ -27,8 +27,8 @@ template <size_t InSize, size_t OutSize>
 class Linear
 {
 public:
-  using InputType = int8_t;
-  using WeightType = int8_t;
+  using InputType = int32_t;
+  using WeightType = int32_t;
   using OutputType = int32_t;
 
   void init(WeightType w[OutSize][InSize], OutputType b[OutSize])
@@ -52,12 +52,8 @@ public:
     for (size_t outIdx = 0; outIdx < OutSize; ++outIdx) {
       auto sum = _mm256_setzero_si256();
       for (size_t inIdx = 0; inIdx < InSize; inIdx += 8) {
-        auto inputChunk = _mm256_setr_epi32(input[inIdx], input[inIdx + 1], input[inIdx + 2], input[inIdx + 3],
-                                            input[inIdx + 4], input[inIdx + 5], input[inIdx + 6], input[inIdx + 7]);
-        auto weightsChunk =
-            _mm256_setr_epi32(weights[outIdx][inIdx], weights[outIdx][inIdx + 1], weights[outIdx][inIdx + 2],
-                              weights[outIdx][inIdx + 3], weights[outIdx][inIdx + 4], weights[outIdx][inIdx + 5],
-                              weights[outIdx][inIdx + 6], weights[outIdx][inIdx + 7]);
+        auto inputChunk = _mm256_load_si256(reinterpret_cast<__m256i const*>(&input[inIdx]));
+        auto weightsChunk = _mm256_load_si256(reinterpret_cast<__m256i const*>(&weights[outIdx][inIdx]));
         auto x = _mm256_mullo_epi32(inputChunk, weightsChunk);
         sum = _mm256_add_epi32(sum, x);
       }

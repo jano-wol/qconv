@@ -15,13 +15,13 @@ TEST(Linear, AllOne)
 {
   constexpr size_t InSize = 512;
   constexpr size_t OutSize = 32;
-  alignas(Alignment) int8_t input[InSize];
-  alignas(Alignment) int8_t weights[OutSize][InSize];
+  alignas(Alignment) int32_t input[InSize];
+  alignas(Alignment) int32_t weights[OutSize][InSize];
   alignas(Alignment) int32_t biases[OutSize];
   Linear<InSize, OutSize> l;
   LinearNaive<InSize, OutSize> lN;
-  constInit(input, InSize, static_cast<int8_t>(1));
-  constInit<int8_t, OutSize, InSize>(weights, static_cast<int8_t>(1));
+  constInit(input, InSize, static_cast<int32_t>(1));
+  constInit<int32_t, OutSize, InSize>(weights, static_cast<int8_t>(1));
   constInit(biases, OutSize, static_cast<int32_t>(1));
   l.init(weights, biases);
   l.propagate(input);
@@ -37,15 +37,15 @@ TEST(Linear, CompareWithNaive)
 {
   constexpr size_t InSize = 512;
   constexpr size_t OutSize = 32;
-  alignas(Alignment) int8_t input[InSize];
-  alignas(Alignment) int8_t weights[OutSize][InSize];
+  alignas(Alignment) int32_t input[InSize];
+  alignas(Alignment) int32_t weights[OutSize][InSize];
   alignas(Alignment) int32_t biases[OutSize];
   Linear<InSize, OutSize> l;
   LinearNaive<InSize, OutSize> lN;
 
   // random input
-  randInit<int8_t>(input, InSize);
-  randInit<int8_t, OutSize, InSize>(weights);
+  randInit<int32_t>(input, InSize);
+  randInit<int32_t, OutSize, InSize>(weights);
   modInit(biases, OutSize, 101);
   l.init(weights, biases);
   l.propagate(input);
@@ -56,8 +56,8 @@ TEST(Linear, CompareWithNaive)
   }
 
   // stress high
-  constInit<int8_t>(input, InSize, 127);
-  constInit<int8_t, OutSize, InSize>(weights, 127);
+  constInit<int32_t>(input, InSize, 127);
+  constInit<int32_t, OutSize, InSize>(weights, 127);
   constInit(biases, OutSize, 127);
   l.init(weights, biases);
   l.propagate(input);
@@ -68,8 +68,8 @@ TEST(Linear, CompareWithNaive)
   }
 
   // stress low
-  constInit<int8_t>(input, InSize, -128);
-  constInit<int8_t, OutSize, InSize>(weights, -128);
+  constInit<int32_t>(input, InSize, -128);
+  constInit<int32_t, OutSize, InSize>(weights, -128);
   constInit(biases, OutSize, -128);
   l.init(weights, biases);
   l.propagate(input);
