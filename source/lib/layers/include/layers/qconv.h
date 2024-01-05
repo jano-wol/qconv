@@ -1,6 +1,8 @@
 #ifndef QCONV_LAYERS_QCONV_H_INCLUDED
 #define QCONV_LAYERS_QCONV_H_INCLUDED
 
+#include <cstring>
+
 #include <simd/simd.h>
 
 static inline int32_t hsum_epi32(__m128i x)
@@ -76,7 +78,7 @@ public:
   // Forward propagation
   void propagate(InputType* input)
   {
-    memset(outputBuf, 0, SpatialOut * SpatialSize * SpatialSize * sizeof(OutputType));
+    std::memset(outputBuf, 0, SpatialOut * SpatialSize * SpatialSize * sizeof(OutputType));
     for (size_t i = 0; i < SpatialIn; ++i) {
       initEnv(input + i * SpatialSize * SpatialSize);
       for (size_t j = 0; j < SpatialOut; ++j) {
