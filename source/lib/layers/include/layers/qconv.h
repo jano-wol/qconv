@@ -1,6 +1,7 @@
 #ifndef QCONV_LAYERS_QCONV_H_INCLUDED
 #define QCONV_LAYERS_QCONV_H_INCLUDED
 
+#include <cassert>
 #include <cstring>
 
 #include <simd/simd.h>
@@ -78,6 +79,7 @@ public:
   // Forward propagation
   void propagate(InputType* input)
   {
+    assert(simd::isPtrAligned(input));
     std::memset(outputBuf, 0, SpatialOut * SpatialSize * SpatialSize * sizeof(OutputType));
     for (size_t i = 0; i < SpatialIn; ++i) {
       initEnv(input + i * SpatialSize * SpatialSize);

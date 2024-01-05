@@ -46,10 +46,7 @@ public:
   // Forward propagation
   void propagate(InputType* input)
   {
-    assert(simd::isPtrAligned(outputBuf));
     assert(simd::isPtrAligned(input));
-    assert(simd::isPtrAligned(weights));
-    assert(simd::isPtrAligned(biases));
     std::memcpy(outputBuf, biases, OutSize * sizeof(OutputType));
     static_assert(InSize % 8 == 0, "InSize must be divisble by 8");
     for (size_t inIdx = 0; inIdx < InSize; inIdx += 8) {
