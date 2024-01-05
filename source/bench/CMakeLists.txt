@@ -1,3 +1,4 @@
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bench/bin)
 #add_subdirectory(add)
 #add_subdirectory(copy)
 #add_subdirectory(dilate)
