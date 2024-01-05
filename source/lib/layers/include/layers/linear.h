@@ -49,18 +49,19 @@ public:
     assert(simd::isPtrAligned(input));
     std::memcpy(outputBuf, biases, OutSize * sizeof(OutputType));
     static_assert(InSize % 8 == 0, "InSize must be divisble by 8");
-    for (size_t inIdx = 0; inIdx < InSize; inIdx += 8) {
-      auto inputChunk = _mm256_setr_epi32(input[inIdx], input[inIdx + 1], input[inIdx + 2], input[inIdx + 3],
-                                          input[inIdx + 4], input[inIdx + 5], input[inIdx + 6], input[inIdx + 7]);
-      for (size_t outIdx = 0; outIdx < OutSize; ++outIdx) {
+    for (size_t outIdx = 0; outIdx < OutSize; ++outIdx) {
+      auto sum = _mm256_setzero_si256();
+      for (size_t inIdx = 0; inIdx < InSize; inIdx += 8) {
+        auto inputChunk = _mm256_setr_epi32(input[inIdx], input[inIdx + 1], input[inIdx + 2], input[inIdx + 3],
+                                            input[inIdx + 4], input[inIdx + 5], input[inIdx + 6], input[inIdx + 7]);
         auto weightsChunk =
             _mm256_setr_epi32(weights[outIdx][inIdx], weights[outIdx][inIdx + 1], weights[outIdx][inIdx + 2],
                               weights[outIdx][inIdx + 3], weights[outIdx][inIdx + 4], weights[outIdx][inIdx + 5],
                               weights[outIdx][inIdx + 6], weights[outIdx][inIdx + 7]);
         auto x = _mm256_mullo_epi32(inputChunk, weightsChunk);
-        auto y = hsum_8x32(x);
-        outputBuf[outIdx] += y;
+        sum = _mm256_add_epi32(sum, x);
       }
+      outputBuf[outIdx] += hsum_8x32(sum);
     }
   }
 
