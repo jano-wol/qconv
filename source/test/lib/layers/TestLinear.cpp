@@ -44,7 +44,7 @@ TEST(Linear, CompareWithNaive)
   LinearNaive<InSize, OutSize> lN;
 
   // random input
-  randInit<uint8_t, 0, 128>(input, InSize);
+  randInit<uint8_t, 0, 127>(input, InSize);
   randInit<int8_t, OutSize, InSize>(weights);
   modInit(biases, OutSize, 101);
   l.init(weights, biases);
