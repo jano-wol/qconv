@@ -41,6 +41,7 @@ public:
   void propagate(InputType* input)
   {
     assert(simd::isPtrAligned(input));
+    for (size_t k = 0; k < InSize; ++k) assert(0 <= input[k] && input[k] <= 127);
     static_assert(InSize % 4 == 0, "InSize must be divisble by 4");
     static_assert(OutSize % 8 == 0, "OutSize must be divisble by 8");
     constexpr size_t InStep = InSize / 4;
