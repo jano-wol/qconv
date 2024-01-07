@@ -10,13 +10,13 @@ using namespace qconv::testutils;
 
 int main()
 {
-  alignas(Alignment) int32_t input[512];
-  alignas(Alignment) int32_t weights[32][512];
+  alignas(Alignment) uint8_t input[512];
+  alignas(Alignment) int8_t weights[32][512];
   alignas(Alignment) int32_t biases[32];
 
   modInit(input, 512, 11);
   modInit(biases, 32, 11);
-  modInit<int32_t, 32, 512>(weights, 128);
+  modInit<int8_t, 32, 512>(weights, 128);
   LinearNaive<512, 32> lN;
   lN.init(weights, biases);
   lN.propagate(input);

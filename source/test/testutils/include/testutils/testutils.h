@@ -60,6 +60,18 @@ void randInit(T* a, size_t s)
   }
 }
 
+template <typename T, int64_t LowerBound, int64_t UpperBound>
+void randInit(T* a, size_t s)
+{
+  static_assert(UpperBound > LowerBound, "UpperBound must be at least LowerBound");
+  std::mt19937 e;
+  int64_t mod = UpperBound - LowerBound + 1;
+  for (size_t i = 0; i < s; ++i) {
+    int64_t r = e() % mod;
+    a[i] = static_cast<T>(LowerBound + r);
+  }
+}
+
 template <typename T, size_t X, size_t Y>
 void randInit(T a[X][Y])
 {
@@ -72,6 +84,20 @@ void randInit(T a[X][Y])
         r -= (mod / 2);
       }
       a[i][j] = r;
+    }
+  }
+}
+
+template <typename T, size_t X, size_t Y, int64_t LowerBound, int64_t UpperBound>
+void randInit(T a[X][Y])
+{
+  static_assert(UpperBound > LowerBound, "UpperBound must be at least LowerBound");
+  std::mt19937 e;
+  int64_t mod = UpperBound - LowerBound + 1;
+  for (size_t i = 0; i < X; ++i) {
+    for (size_t j = 0; j < Y; ++j) {
+      int r = e() % mod;
+      a[i][j] = static_cast<T>(LowerBound + r);
     }
   }
 }

@@ -9,8 +9,8 @@ template <size_t InSize, size_t OutSize>
 class LinearNaive
 {
 public:
-  using InputType = int32_t;
-  using WeightType = int32_t;
+  using InputType = uint8_t;
+  using WeightType = int8_t;
   using OutputType = int32_t;
 
   void init(WeightType w[OutSize][InSize], OutputType b[OutSize])
