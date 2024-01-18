@@ -75,9 +75,10 @@ public:
           for (size_t l = 0; l < OutStep; ++l) {
             for (size_t m = 0; m < KernelSize * KernelSize; ++m) {
               size_t OutIdx = InIdx + relDir[m];
+              __m256i& update = output256[OutIdx * OutStep + l];
               for (size_t n = 0; n < 8; ++n) {
                 auto mul = _mm256_mullo_epi32(curr, weights[k][l][m][n]);
-                output256[OutIdx * OutStep + l] = _mm256_add_epi32(mul, output256[OutIdx * OutStep + l]);
+                update = _mm256_add_epi32(mul, update);
                 curr = _mm256_permutevar8x32_epi32(curr, epi32_256_ctl_1);
               }
             }
@@ -88,32 +89,43 @@ public:
   }
 
   template <typename T>
-  void propagateRaw(T* input, OutputType* output)
+  void padInput(T* input, InputType* paddedInput)
   {
-    alignas(simd::Alignment) InputType inputPadded[SpatialIn * SpatialSizePadded * SpatialSizePadded];
-    alignas(simd::Alignment) InputType inputPadded2[SpatialIn * SpatialSizePadded * SpatialSizePadded];
+    InputType help[SpatialIn * SpatialSizePadded * SpatialSizePadded];
     size_t inIdx = 0;
     for (size_t i = 0; i < SpatialIn; ++i) {
       for (size_t j = 0; j < SpatialSizePadded * SpatialSizePadded; ++j) {
         if (isPad(j)) {
-          inputPadded[i * SpatialSizePadded * SpatialSizePadded + j] = -1;
+          help[i * SpatialSizePadded * SpatialSizePadded + j] = -1;
         } else {
-          inputPadded[i * SpatialSizePadded * SpatialSizePadded + j] = static_cast<InputType>(input[inIdx++]);
+          help[i * SpatialSizePadded * SpatialSizePadded + j] = static_cast<InputType>(input[inIdx++]);
         }
       }
     }
     for (size_t i = 0; i < SpatialIn * SpatialSizePadded * SpatialSizePadded; ++i) {
       auto pos = i / SpatialIn;
       auto depth = i % SpatialIn;
-      inputPadded2[i] = inputPadded[depth * SpatialSizePadded * SpatialSizePadded + pos];
+      paddedInput[i] = help[depth * SpatialSizePadded * SpatialSizePadded + pos];
     }
-    propagate(inputPadded2);
+  }
+
+  void getUnpaddedOutput(OutputType* output)
+  {
     for (size_t i = 0; i < SpatialOut; ++i) {
       for (size_t j = 0; j < SpatialSize * SpatialSize; ++j) {
-        auto pos = (j / SpatialSize + 1) * SpatialSizePadded + j % SpatialSize + 1 ;
+        auto pos = (j / SpatialSize + 1) * SpatialSizePadded + j % SpatialSize + 1;
         output[i * SpatialSize * SpatialSize + j] = outputBuf[pos * SpatialOut + i];
       }
     }
+  }
+
+  template <typename T>
+  void propagateRaw(T* input, OutputType* output)
+  {
+    alignas(simd::Alignment) InputType paddedInput[SpatialIn * SpatialSizePadded * SpatialSizePadded];
+    padInput<T>(input, paddedInput);
+    propagate(paddedInput);
+    getUnpaddedOutput(output);
   }
 
   alignas(simd::Alignment) __m256i weights[InStep][OutStep][KernelSize * KernelSize][8];
