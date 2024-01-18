@@ -50,7 +50,7 @@ public:
     }
   }
 
-  bool isPad(int i)
+  bool isPad(size_t i)
   {
     return ((i < SpatialSizePadded) || (i % SpatialSizePadded == 0) || ((i + 1) % SpatialSizePadded == 0) ||
             (SpatialSizePadded * (SpatialSizePadded - 1) <= i));
@@ -63,9 +63,8 @@ public:
     std::memset(outputBuf, 0, SpatialOut * SpatialSizePadded * SpatialSizePadded * sizeof(OutputType));
     const auto input256 = reinterpret_cast<const __m256i*>(input);
     auto output256 = reinterpret_cast<__m256i*>(outputBuf);
-    const int relDir[KernelSize * KernelSize] = {
-        -SpatialSizePadded - 1, -SpatialSizePadded, -SpatialSizePadded + 1, -1, 0, 1,
-        SpatialSizePadded - 1,  SpatialSizePadded,  SpatialSizePadded + 1};
+    int s = static_cast<int>(SpatialSizePadded);
+    const int relDir[KernelSize * KernelSize] = {-s - 1, -s, -s + 1, -1, 0, 1, s - 1, s, s + 1};
     const __m256i epi32_256_ctl_1 = _mm256_set_epi32(0, 1, 2, 3, 4, 5, 6, 7);
     for (size_t i = 0; i < SpatialSize; ++i) {
       for (size_t j = 0; j < SpatialSize; ++j) {
@@ -88,7 +87,7 @@ public:
   }
 
   template <typename T>
-  OutputType* propagateRaw(T* input, OutputType* output)
+  void propagateRaw(T* input, OutputType* output)
   {
     alignas(simd::Alignment) InputType inputPadded[SpatialIn * SpatialSizePadded * SpatialSizePadded];
     size_t inIdx = 0;
