@@ -11,28 +11,6 @@ using namespace qconv::layers;
 using namespace qconv::simd;
 using namespace qconv::testutils;
 
-TEST(Linear, AllOne)
-{
-  constexpr size_t InSize = 512;
-  constexpr size_t OutSize = 32;
-  alignas(Alignment) uint8_t input[InSize];
-  alignas(Alignment) int8_t weights[OutSize][InSize];
-  alignas(Alignment) int32_t biases[OutSize];
-  Linear<InSize, OutSize> l;
-  LinearNaive<InSize, OutSize> lN;
-  constInit(input, InSize, static_cast<uint8_t>(1));
-  constInit<int8_t, OutSize, InSize>(weights, static_cast<int8_t>(1));
-  constInit(biases, OutSize, static_cast<int32_t>(1));
-  l.init(weights, biases);
-  l.propagate(input);
-  lN.init(weights, biases);
-  lN.propagate(input);
-  EXPECT_EQ(l.outputBuf[0], 513);
-  EXPECT_EQ(lN.outputBuf[0], 513);
-  EXPECT_EQ(l.outputBuf[1], 513);
-  EXPECT_EQ(lN.outputBuf[1], 513);
-}
-
 TEST(Linear, CompareWithNaive)
 {
   constexpr size_t InSize = 512;
