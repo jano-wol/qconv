@@ -1,5 +1,5 @@
-#ifndef QCONV_LAYERS_QCONV2_H_INCLUDED
-#define QCONV_LAYERS_QCONV2_H_INCLUDED
+#ifndef QCONV_LAYERS_QCONV_THICK_H_INCLUDED
+#define QCONV_LAYERS_QCONV_THICK_H_INCLUDED
 
 #include <cassert>
 #include <cstring>
@@ -36,15 +36,9 @@ public:
       for (size_t l = 0; l < OutStep; ++l) {
         for (size_t m = 0; m < KernelSize * KernelSize; ++m) {
           for (size_t n = 0; n < 8; ++n) {
-            auto w1 = getW<T>(k * 8 + (n + 0) % 8, l * 8 + 0, m, w);
-            auto w2 = getW<T>(k * 8 + (n + 1) % 8, l * 8 + 1, m, w);
-            auto w3 = getW<T>(k * 8 + (n + 2) % 8, l * 8 + 2, m, w);
-            auto w4 = getW<T>(k * 8 + (n + 3) % 8, l * 8 + 3, m, w);
-            auto w5 = getW<T>(k * 8 + (n + 4) % 8, l * 8 + 4, m, w);
-            auto w6 = getW<T>(k * 8 + (n + 5) % 8, l * 8 + 5, m, w);
-            auto w7 = getW<T>(k * 8 + (n + 6) % 8, l * 8 + 6, m, w);
-            auto w8 = getW<T>(k * 8 + (n + 7) % 8, l * 8 + 7, m, w);
-            weights[k][l][m][n] = _mm256_setr_epi32(w1, w2, w3, w4, w5, w6, w7, w8);
+            for (int p = 0; p < 8; ++p) {
+              weights[k][l][m][n][p] = getW<T>(k * 8 + (n + p) % 8, l * 8 + p, m, w);
+            }
           }
         }
       }
@@ -77,7 +71,8 @@ public:
               size_t OutIdx = InIdx + relDir[m];
               __m256i& update = output256[OutIdx * OutStep + l];
               for (size_t n = 0; n < 8; ++n) {
-                auto mul = _mm256_mullo_epi32(curr, weights[k][l][m][n]);
+                const auto w = reinterpret_cast<const __m256i*>(&weights[k][l][m][n][0]);
+                auto mul = _mm256_mullo_epi32(curr, *w);
                 update = _mm256_add_epi32(mul, update);
                 curr = _mm256_permutevar8x32_epi32(curr, epi32_256_ctl_1);
               }
@@ -128,9 +123,9 @@ public:
     getUnpaddedOutput(output);
   }
 
-  alignas(simd::Alignment) __m256i weights[InStep][OutStep][KernelSize * KernelSize][8];
+  alignas(simd::Alignment) WeightType weights[InStep][OutStep][KernelSize * KernelSize][8][8];
   alignas(simd::Alignment) OutputType outputBuf[SpatialOut * SpatialSizePadded * SpatialSizePadded];
 };
 }  // namespace qconv::layers
 
-#endif  // #ifndef QCONV_LAYERS_QCONV2_H_INCLUDED
+#endif  // #ifndef QCONV_LAYERS_QCONV_THICK_H_INCLUDED
