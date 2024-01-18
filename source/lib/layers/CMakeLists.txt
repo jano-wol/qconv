@@ -5,11 +5,13 @@ set(headers ${include_path}/linear.h
             ${include_path}/linear_naive.h
             ${include_path}/qconv.h
             ${include_path}/qconv_naive.h
+            ${include_path}/qconv_thick.h
             )
 set(sources ${source_path}/linear.cpp
             ${source_path}/linear_naive.cpp
             ${source_path}/qconv.cpp
             ${source_path}/qconv_naive.cpp
+            ${source_path}/qconv_thick.cpp
             )			
 add_library(${target} ${headers} ${sources})
 target_include_directories(${target} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
