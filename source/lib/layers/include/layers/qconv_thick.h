@@ -24,8 +24,9 @@ public:
   template <typename T>
   WeightType getW(int in, int out, int kernelId, T* w)
   {
-    return static_cast<WeightType>(
-        w[out * SpatialIn * KernelSize * KernelSize + in * KernelSize * KernelSize + kernelId]);
+    auto ret = static_cast<WeightType>(w[out * SpatialIn * KernelSize * KernelSize + in * KernelSize * KernelSize +
+                                         KernelSize * KernelSize - 1 - kernelId]);
+    return ret;
   }
 
   template <typename T>
@@ -65,7 +66,7 @@ public:
     auto output256 = reinterpret_cast<__m256i*>(outputBuf);
     int s = static_cast<int>(SpatialSizePadded);
     const int relDir[KernelSize * KernelSize] = {-s - 1, -s, -s + 1, -1, 0, 1, s - 1, s, s + 1};
-    const __m256i epi32_256_ctl_1 = _mm256_set_epi32(0, 1, 2, 3, 4, 5, 6, 7);
+    const __m256i epi32_256_ctl_1 = _mm256_set_epi32(0, 7, 6, 5, 4, 3, 2, 1);
     for (size_t i = 0; i < SpatialSize; ++i) {
       for (size_t j = 0; j < SpatialSize; ++j) {
         size_t InIdx = (i + 1) * SpatialSizePadded + (j + 1);
@@ -90,6 +91,7 @@ public:
   void propagateRaw(T* input, OutputType* output)
   {
     alignas(simd::Alignment) InputType inputPadded[SpatialIn * SpatialSizePadded * SpatialSizePadded];
+    alignas(simd::Alignment) InputType inputPadded2[SpatialIn * SpatialSizePadded * SpatialSizePadded];
     size_t inIdx = 0;
     for (size_t i = 0; i < SpatialIn; ++i) {
       for (size_t j = 0; j < SpatialSizePadded * SpatialSizePadded; ++j) {
@@ -100,15 +102,16 @@ public:
         }
       }
     }
-    propagate(inputPadded);
-    size_t outIdx = 0;
+    for (size_t i = 0; i < SpatialIn * SpatialSizePadded * SpatialSizePadded; ++i) {
+      auto pos = i / SpatialIn;
+      auto depth = i % SpatialIn;
+      inputPadded2[i] = inputPadded[depth * SpatialSizePadded * SpatialSizePadded + pos];
+    }
+    propagate(inputPadded2);
     for (size_t i = 0; i < SpatialOut; ++i) {
-      for (size_t j = 0; j < SpatialSizePadded * SpatialSizePadded; ++j) {
-        if (isPad(j)) {
-          continue;
-        } else {
-          output[outIdx++] = outputBuf[i * SpatialSizePadded * SpatialSizePadded + j];
-        }
+      for (size_t j = 0; j < SpatialSize * SpatialSize; ++j) {
+        auto pos = (j / SpatialSize + 1) * SpatialSizePadded + j % SpatialSize + 1 ;
+        output[i * SpatialSize * SpatialSize + j] = outputBuf[pos * SpatialOut + i];
       }
     }
   }
