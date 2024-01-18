@@ -17,13 +17,13 @@ public:
   using InputType = int32_t;
   using WeightType = int32_t;
   using OutputType = int32_t;
-  constexpr size_t SpatialSizePadded = SpatialSize + 2;
-  constexpr size_t InStep = SpatialIn / 8;
-  constexpr size_t OutStep = SpatialOut / 8;
+  static constexpr size_t SpatialSizePadded = SpatialSize + 2;
+  static constexpr size_t InStep = SpatialIn / 8;
+  static constexpr size_t OutStep = SpatialOut / 8;
 
   WeightType getW(int in, int out, int kernelId, WeightType* w)
   {
-    return w[out * SpatialIn * KernelSize * KernelSize + in * KernelSize * KernelSize + kenelId];
+    return w[out * SpatialIn * KernelSize * KernelSize + in * KernelSize * KernelSize + kernelId];
   }
 
   void initWeights(WeightType* w)
@@ -52,8 +52,8 @@ public:
   {
     assert(simd::isPtrAligned(input));
     std::memset(outputBuf, 0, SpatialOut * SpatialSizePadded * SpatialSizePadded * sizeof(OutputType));
-    const auto input256 = reinterpret_cast<const __mm256i*>(input);
-    auto output256 = reinterpret_cast<__mm256i*>(outputBuf);
+    const auto input256 = reinterpret_cast<const __m256i*>(input);
+    auto output256 = reinterpret_cast<__m256i*>(outputBuf);
     const int relDir[KernelSize * KernelSize] = {
         -SpatialSizePadded - 1, -SpatialSizePadded, -SpatialSizePadded + 1, -1, 0, 1,
         SpatialSizePadded - 1,  SpatialSizePadded,  SpatialSizePadded + 1};
@@ -62,8 +62,8 @@ public:
       for (size_t j = 0; j < SpatialSize; ++j) {
         size_t InIdx = (i + 1) * SpatialSizePadded + (j + 1);
         for (size_t k = 0; k < InStep; ++k) {
-          __mm256i curr = input256[InIdx * InStep + k];
-          for (size_t l = 0; l < OutputStep; ++l) {
+          __m256i curr = input256[InIdx * InStep + k];
+          for (size_t l = 0; l < OutStep; ++l) {
             for (size_t m = 0; m < KernelSize * KernelSize; ++m) {
               size_t OutIdx = InIdx + relDir[m];
               for (size_t n = 0; n < 8; ++n) {
