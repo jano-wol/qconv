@@ -9,7 +9,7 @@
 namespace qconv::layers
 {
 template <size_t SpatialIn, size_t SpatialOut, size_t SpatialSize, size_t KernelSize>
-class QConv2
+class QConvThick
 {
 public:
   static_assert(KernelSize == 3, "Only 3x3 kernels are supported now!");
@@ -21,30 +21,39 @@ public:
   static constexpr size_t InStep = SpatialIn / 8;
   static constexpr size_t OutStep = SpatialOut / 8;
 
-  WeightType getW(int in, int out, int kernelId, WeightType* w)
+  template <typename T>
+  WeightType getW(int in, int out, int kernelId, T* w)
   {
-    return w[out * SpatialIn * KernelSize * KernelSize + in * KernelSize * KernelSize + kernelId];
+    return static_cast<WeightType>(
+        w[out * SpatialIn * KernelSize * KernelSize + in * KernelSize * KernelSize + kernelId]);
   }
 
-  void initWeights(WeightType* w)
+  template <typename T>
+  void initWeights(T* w)
   {
     for (size_t k = 0; k < InStep; ++k) {
       for (size_t l = 0; l < OutStep; ++l) {
         for (size_t m = 0; m < KernelSize * KernelSize; ++m) {
           for (size_t n = 0; n < 8; ++n) {
-            auto w1 = getW(k * 8 + (n + 0) % 8, l * 8 + 0, m, w);
-            auto w2 = getW(k * 8 + (n + 1) % 8, l * 8 + 1, m, w);
-            auto w3 = getW(k * 8 + (n + 2) % 8, l * 8 + 2, m, w);
-            auto w4 = getW(k * 8 + (n + 3) % 8, l * 8 + 3, m, w);
-            auto w5 = getW(k * 8 + (n + 4) % 8, l * 8 + 4, m, w);
-            auto w6 = getW(k * 8 + (n + 5) % 8, l * 8 + 5, m, w);
-            auto w7 = getW(k * 8 + (n + 6) % 8, l * 8 + 6, m, w);
-            auto w8 = getW(k * 8 + (n + 7) % 8, l * 8 + 7, m, w);
+            auto w1 = getW<T>(k * 8 + (n + 0) % 8, l * 8 + 0, m, w);
+            auto w2 = getW<T>(k * 8 + (n + 1) % 8, l * 8 + 1, m, w);
+            auto w3 = getW<T>(k * 8 + (n + 2) % 8, l * 8 + 2, m, w);
+            auto w4 = getW<T>(k * 8 + (n + 3) % 8, l * 8 + 3, m, w);
+            auto w5 = getW<T>(k * 8 + (n + 4) % 8, l * 8 + 4, m, w);
+            auto w6 = getW<T>(k * 8 + (n + 5) % 8, l * 8 + 5, m, w);
+            auto w7 = getW<T>(k * 8 + (n + 6) % 8, l * 8 + 6, m, w);
+            auto w8 = getW<T>(k * 8 + (n + 7) % 8, l * 8 + 7, m, w);
             weights[k][l][m][n] = _mm256_setr_epi32(w1, w2, w3, w4, w5, w6, w7, w8);
           }
         }
       }
     }
+  }
+
+  bool isPad(int i)
+  {
+    return ((i < SpatialSizePadded) || (i % SpatialSizePadded == 0) || ((i + 1) % SpatialSizePadded == 0) ||
+            (SpatialSizePadded * (SpatialSizePadded - 1) <= i));
   }
 
   // Forward propagation
@@ -73,6 +82,33 @@ public:
               }
             }
           }
+        }
+      }
+    }
+  }
+
+  template <typename T>
+  OutputType* propagateRaw(T* input, OutputType* output)
+  {
+    alignas(simd::Alignment) InputType inputPadded[SpatialIn * SpatialSizePadded * SpatialSizePadded];
+    size_t inIdx = 0;
+    for (size_t i = 0; i < SpatialIn; ++i) {
+      for (size_t j = 0; j < SpatialSizePadded * SpatialSizePadded; ++j) {
+        if (isPad(j)) {
+          inputPadded[i * SpatialSizePadded * SpatialSizePadded + j] = -1;
+        } else {
+          inputPadded[i * SpatialSizePadded * SpatialSizePadded + j] = static_cast<InputType>(input[inIdx++]);
+        }
+      }
+    }
+    propagate(inputPadded);
+    size_t outIdx = 0;
+    for (size_t i = 0; i < SpatialOut; ++i) {
+      for (size_t j = 0; j < SpatialSizePadded * SpatialSizePadded; ++j) {
+        if (isPad(j)) {
+          continue;
+        } else {
+          output[outIdx++] = outputBuf[i * SpatialSizePadded * SpatialSizePadded + j];
         }
       }
     }
