@@ -12,8 +12,8 @@ template <size_t SpatialIn, size_t SpatialOut, size_t SpatialSize, size_t Kernel
 class QConvThick
 {
 public:
-  static_assert(KernelSize == 3, "Only 3x3 kernels are supported now!");
-  static_assert(SpatialIn % 8 == 0 && SpatialOut % 8 == 0, "Only eigth divisible spatial dims are supported now!");
+  static_assert(KernelSize == 3, "3x3 kernels are supported in QConvThick.");
+  static_assert(SpatialIn % 8 == 0 && SpatialOut % 8 == 0, "Eigth divisible spatial dims are supported in QConvThick.");
   using InputType = int32_t;
   using WeightType = int32_t;
   using OutputType = int32_t;
