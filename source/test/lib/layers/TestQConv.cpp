@@ -31,7 +31,7 @@ TEST(QConv, CompareWithNaive)
   qN.initWeights(weights);
   qN.propagate(input);
   qT.initWeights<int16_t>(weights);
-  qT.propagateRaw<int8_t>(input, outputThick);
+  qT.propagateUSC<int8_t>(input, outputThick);
   for (int i = 0; i < SpatialOut * 20 * 20; ++i) {
     EXPECT_EQ(q.outputBuf[i], qN.outputBuf[i]);
     EXPECT_EQ(outputThick[i], qN.outputBuf[i]);
@@ -45,7 +45,7 @@ TEST(QConv, CompareWithNaive)
   qN.initWeights(weights);
   qN.propagate(input);
   qT.initWeights<int16_t>(weights);
-  qT.propagateRaw<int8_t>(input, outputThick);
+  qT.propagateUSC<int8_t>(input, outputThick);
   for (int i = 0; i < SpatialOut * 20 * 20; ++i) {
     EXPECT_EQ(q.outputBuf[i], qN.outputBuf[i]);
     EXPECT_EQ(outputThick[i], qN.outputBuf[i]);
@@ -59,7 +59,7 @@ TEST(QConv, CompareWithNaive)
   qN.initWeights(weights);
   qN.propagate(input);
   qT.initWeights<int16_t>(weights);
-  qT.propagateRaw<int8_t>(input, outputThick);
+  qT.propagateUSC<int8_t>(input, outputThick);
   for (int i = 0; i < SpatialOut * 20 * 20; ++i) {
     EXPECT_EQ(q.outputBuf[i], qN.outputBuf[i]);
     EXPECT_EQ(outputThick[i], qN.outputBuf[i]);

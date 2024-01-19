@@ -22,14 +22,6 @@ public:
   static constexpr size_t OutStep = SpatialOut / 8;
 
   template <typename T>
-  WeightType getW(int in, int out, int kernelId, T* w)
-  {
-    auto ret = static_cast<WeightType>(w[out * SpatialIn * KernelSize * KernelSize + in * KernelSize * KernelSize +
-                                         KernelSize * KernelSize - 1 - kernelId]);
-    return ret;
-  }
-
-  template <typename T>
   void initWeights(T* w)
   {
     for (size_t k = 0; k < InStep; ++k) {
@@ -45,20 +37,14 @@ public:
     }
   }
 
-  bool isPad(size_t i)
-  {
-    return ((i < SpatialSizePadded) || (i % SpatialSizePadded == 0) || ((i + 1) % SpatialSizePadded == 0) ||
-            (SpatialSizePadded * (SpatialSizePadded - 1) <= i));
-  }
-
-  // Forward propagation
+  // Forward propagation. Input has to be Padded Depth Continuous.
   void propagate(InputType* input)
   {
     assert(simd::isPtrAligned(input));
     std::memset(outputBuf, 0, SpatialOut * SpatialSizePadded * SpatialSizePadded * sizeof(OutputType));
-    const auto input256 = reinterpret_cast<const __m256i*>(input);
     auto output256 = reinterpret_cast<__m256i*>(outputBuf);
-    int s = static_cast<int>(SpatialSizePadded);
+    const auto input256 = reinterpret_cast<const __m256i*>(input);
+    const int s = static_cast<int>(SpatialSizePadded);
     const int relDir[KernelSize * KernelSize] = {-s - 1, -s, -s + 1, -1, 0, 1, s - 1, s, s + 1};
     const __m256i epi32_256_ctl_1 = _mm256_set_epi32(0, 7, 6, 5, 4, 3, 2, 1);
     for (size_t i = 0; i < SpatialSize; ++i) {
@@ -83,8 +69,33 @@ public:
     }
   }
 
+  // Forward propagation for Unpadded Spatial Continous input/output. Less performant, implemented for testing purposes.
   template <typename T>
-  void padInput(T* input, InputType* paddedInput)
+  void propagateUSC(T* input, OutputType* output)
+  {
+    alignas(simd::Alignment) InputType pdcInput[SpatialIn * SpatialSizePadded * SpatialSizePadded];
+    USCToPDC<T>(input, pdcInput);
+    propagate(pdcInput);
+    getUSCOutput(output);
+  }
+
+  // Helper functions
+  template <typename T>
+  WeightType getW(int in, int out, int kernelId, T* w)
+  {
+    auto ret = static_cast<WeightType>(w[out * SpatialIn * KernelSize * KernelSize + in * KernelSize * KernelSize +
+                                         KernelSize * KernelSize - 1 - kernelId]);
+    return ret;
+  }
+
+  bool isPad(size_t i)
+  {
+    return ((i < SpatialSizePadded) || (i % SpatialSizePadded == 0) || ((i + 1) % SpatialSizePadded == 0) ||
+            (SpatialSizePadded * (SpatialSizePadded - 1) <= i));
+  }
+
+  template <typename T>
+  void USCToPDC(T* input, InputType* pdcInput)
   {
     InputType help[SpatialIn * SpatialSizePadded * SpatialSizePadded];
     size_t inIdx = 0;
@@ -100,11 +111,11 @@ public:
     for (size_t i = 0; i < SpatialIn * SpatialSizePadded * SpatialSizePadded; ++i) {
       auto pos = i / SpatialIn;
       auto depth = i % SpatialIn;
-      paddedInput[i] = help[depth * SpatialSizePadded * SpatialSizePadded + pos];
+      pdcInput[i] = help[depth * SpatialSizePadded * SpatialSizePadded + pos];
     }
   }
 
-  void getUnpaddedOutput(OutputType* output)
+  void getUSCOutput(OutputType* output)
   {
     for (size_t i = 0; i < SpatialOut; ++i) {
       for (size_t j = 0; j < SpatialSize * SpatialSize; ++j) {
@@ -112,15 +123,6 @@ public:
         output[i * SpatialSize * SpatialSize + j] = outputBuf[pos * SpatialOut + i];
       }
     }
-  }
-
-  template <typename T>
-  void propagateRaw(T* input, OutputType* output)
-  {
-    alignas(simd::Alignment) InputType paddedInput[SpatialIn * SpatialSizePadded * SpatialSizePadded];
-    padInput<T>(input, paddedInput);
-    propagate(paddedInput);
-    getUnpaddedOutput(output);
   }
 
   alignas(simd::Alignment) WeightType weights[InStep][OutStep][KernelSize * KernelSize][8][8];

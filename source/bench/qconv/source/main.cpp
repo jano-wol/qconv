@@ -51,20 +51,20 @@ void qconv_thick_simdops(benchmark::State& state)
   constexpr int SpatialIn = 16;
   constexpr int SpatialOut = 16;
   alignas(simd::Alignment) int32_t input[SpatialIn * 20 * 20];
-  alignas(simd::Alignment) int32_t inputPadded[SpatialIn * 22 * 22];
-  alignas(simd::Alignment) int32_t unpaddedOutput[SpatialOut * 20 * 20];
+  alignas(simd::Alignment) int32_t inputPDC[SpatialIn * 22 * 22];
+  alignas(simd::Alignment) int32_t output[SpatialOut * 20 * 20];
   alignas(simd::Alignment) int32_t weights[SpatialIn * SpatialOut * 3 * 3];
   modInit(input, SpatialIn * 20 * 20, 13);
   modInit(weights, SpatialIn * SpatialOut * 3 * 3, 11);
   QConvThick<SpatialIn, SpatialOut, 20, 3> q;
   q.initWeights<int32_t>(weights);
-  q.padInput(input, inputPadded);
+  q.USCToPDC(input, inputPDC);
   for (auto _ : state) {
-    q.propagate(inputPadded);
+    q.propagate(inputPDC);
     benchmark::ClobberMemory();
   }
-  q.getUnpaddedOutput(unpaddedOutput);
-  checkTrue(q.outputBuf[0] != 1);
+  q.getUSCOutput(output);
+  checkTrue(output[0] != 1);
 }
 BENCHMARK(qconv_thick_simdops);
 BENCHMARK_MAIN();
