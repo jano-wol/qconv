@@ -4,32 +4,54 @@
 #include <iostream>
 #include <random>
 
-#include <simdops/simdops.h>
+#include <simd/simd.h>
 
 namespace qconv::testutils
 {
 template <typename T>
-void constInit(T* a, int s, T v)
+void constInit(T* a, size_t s, T v)
 {
-  for (int i = 0; i < s; ++i) {
+  for (size_t i = 0; i < s; ++i) {
     a[i] = v;
   }
 }
 
-template <typename T>
-void modInit(T* a, int s, int mod)
+template <typename T, size_t X, size_t Y>
+void constInit(T a[X][Y], T v)
 {
-  for (int i = 0; i < s; ++i) {
-    a[i] = i % mod;
+  for (size_t i = 0; i < X; ++i) {
+    for (size_t j = 0; j < Y; ++j) {
+      a[i][j] = v;
+    }
   }
 }
 
 template <typename T>
-void randInit(T* a, int s)
+void modInit(T* a, size_t s, int mod)
+{
+  for (size_t i = 0; i < s; ++i) {
+    a[i] = i % mod;
+  }
+}
+
+template <typename T, size_t X, size_t Y>
+void modInit(T a[X][Y], int mod)
+{
+  size_t n = 0;
+  for (size_t i = 0; i < X; ++i) {
+    for (size_t j = 0; j < Y; ++j) {
+      a[i][j] = (i + j) % mod;
+      ++n;
+    }
+  }
+}
+
+template <typename T>
+void randInit(T* a, size_t s)
 {
   std::mt19937 e;
   unsigned long long mod = (1UL << (sizeof(T) * 8));
-  for (int i = 0; i < s; ++i) {
+  for (size_t i = 0; i < s; ++i) {
     int r = e() % mod;
     if (std::is_signed<T>::value) {
       r -= (mod / 2);
@@ -38,35 +60,67 @@ void randInit(T* a, int s)
   }
 }
 
-template <typename T>
-void weightInit_32_512(T a[32][512])
+template <typename T, int64_t LowerBound, int64_t UpperBound>
+void randInit(T* a, size_t s)
 {
-  for (int i = 0; i < 32; ++i) {
-    for (int j = 0; j < 512; ++j) {
-      a[i][j] = (i + j) % 128;
+  static_assert(UpperBound > LowerBound, "UpperBound must be at least LowerBound");
+  std::mt19937 e;
+  int64_t mod = UpperBound - LowerBound + 1;
+  for (size_t i = 0; i < s; ++i) {
+    int64_t r = e() % mod;
+    a[i] = static_cast<T>(LowerBound + r);
+  }
+}
+
+template <typename T, size_t X, size_t Y>
+void randInit(T a[X][Y])
+{
+  std::mt19937 e;
+  unsigned long long mod = (1UL << (sizeof(T) * 8));
+  for (size_t i = 0; i < X; ++i) {
+    for (size_t j = 0; j < Y; ++j) {
+      int r = e() % mod;
+      if (std::is_signed<T>::value) {
+        r -= (mod / 2);
+      }
+      a[i][j] = r;
+    }
+  }
+}
+
+template <typename T, size_t X, size_t Y, int64_t LowerBound, int64_t UpperBound>
+void randInit(T a[X][Y])
+{
+  static_assert(UpperBound > LowerBound, "UpperBound must be at least LowerBound");
+  std::mt19937 e;
+  int64_t mod = UpperBound - LowerBound + 1;
+  for (size_t i = 0; i < X; ++i) {
+    for (size_t j = 0; j < Y; ++j) {
+      int r = e() % mod;
+      a[i][j] = static_cast<T>(LowerBound + r);
     }
   }
 }
 
 template <typename PrintType>
-void printLongRegister(simde__m128i v)
+void printLongRegister(__m128i v)
 {
-  constexpr size_t N = sizeof(simde__m128i) / sizeof(PrintType);
+  constexpr size_t N = sizeof(__m128i) / sizeof(PrintType);
   PrintType values[N];
-  simde_mm_storeu_si128(values, v);
-  for (int i = 0; i < N; ++i) {
+  _mm_storeu_si128(reinterpret_cast<__m128i_u*>(values), v);
+  for (size_t i = 0; i < N; ++i) {
     std::cout << static_cast<int>(values[i]) << " ";
   }
   std::cout << "\n";
 }
 
 template <typename PrintType>
-void printLongRegister(simde__m256i v)
+void printLongRegister(__m256i v)
 {
-  constexpr size_t N = sizeof(simde__m256i) / sizeof(PrintType);
+  constexpr size_t N = sizeof(__m256i) / sizeof(PrintType);
   PrintType values[N];
-  simde_mm256_storeu_si256(values, v);
-  for (int i = 0; i < N; ++i) {
+  _mm256_storeu_si256(reinterpret_cast<__m256i_u*>(values), v);
+  for (size_t i = 0; i < N; ++i) {
     std::cout << static_cast<int>(values[i]) << " ";
   }
   std::cout << "\n";

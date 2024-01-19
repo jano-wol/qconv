@@ -1,10 +1,5 @@
-add_subdirectory(add)
-add_subdirectory(copy)
-add_subdirectory(dilate)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bench/bin)
 add_subdirectory(linear)
-add_subdirectory(min_max)
-add_subdirectory(min_max_h)
 add_subdirectory(qconv)
-add_subdirectory(relu)
-add_subdirectory(zero)
+
 

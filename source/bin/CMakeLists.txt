@@ -1,0 +1,5 @@
+add_subdirectory(linear)
+add_subdirectory(linear_naive)
+add_subdirectory(qconv)
+add_subdirectory(qconv_naive)
+add_subdirectory(qconv_thick)
