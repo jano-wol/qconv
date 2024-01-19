@@ -27,7 +27,7 @@ template <size_t SpatialIn, size_t SpatialOut, size_t SpatialSize, size_t Kernel
 class QConv
 {
 public:
-  static_assert(KernelSize == 3, "Only 3x3 kernels are supported now!");
+  static_assert(KernelSize == 3, "3x3 kernels are supported in QConv.");
   using InputType = int8_t;
   using WeightType = int16_t;
   using OutputType = int32_t;
